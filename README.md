@@ -8,8 +8,7 @@ This repository holds the documentation: architecture, decisions, requirement tr
 
 | Path | What |
 |---|---|
-| `reports/01-prijava-teme/` | Topic submission (Slovenian, LaTeX) — `prijava-teme.tex` + TikZ diagram `diagrams/arhitektura.tex` → `prijava-teme.pdf` |
-| `reports/_predloga/` | Pandoc/LaTeX template for Markdown-based reports |
+| `reports/` | Reports (topic submission, final report). Kept locally and out of git until they are final. |
 | `COMPLIANCE.md` | Every course requirement, its status, interpretations and deviations |
 | `PLAN.md` | Implementation plan: waves, owners, conventions, budget, risks |
 | `docs/decisions.md` | Open and accepted team decisions with options and recommendations |
