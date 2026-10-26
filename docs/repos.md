@@ -1,6 +1,6 @@
-# Repositories (GitLab group `fri-mag/rso`)
+# Repositories (GitHub organization `rso-ekipa13`)
 
-Group: <https://gitlab.koderverse.com/fri-mag/rso> (public). One public project per deployable unit. Project name and description = microservice name and description (env-setup gist). Created by `scripts/bootstrap-gitlab-group.sh`; `scripts/bootstrap-github-org.sh` is kept for a later GitHub mirror.
+Primary: <https://github.com/rso-ekipa13> (public). Mirror: <https://gitlab.koderverse.com/fri-mag/rso>. One public repository per deployable unit; name and description = microservice name and description (env-setup gist). Created by `scripts/bootstrap-github-org.sh` (GitLab: `scripts/bootstrap-gitlab-group.sh`).
 
 | Project | Kind | Owner | Description |
 |---|---|---|---|
@@ -15,9 +15,9 @@ Group: <https://gitlab.koderverse.com/fri-mag/rso> (public). One public project 
 | `client-app` | GUI | Eva Vidic (+ all) | Flutter client (Android, iOS and web) with on-device MLS end-to-end encryption, rich text and encrypted images. |
 | `platform` | infrastructure | Tibor Koderman | Terraform for Azure, cluster platform (Envoy Gateway, NATS, ScyllaDB, CloudNativePG, observability) and the local dev environment. |
 | `docs` | documentation | all | Architecture (C4, ADRs), requirements compliance, topic submission and the final technical report (Slovenian). This repository. |
-| `ci-templates` | CI | Tibor Koderman | Reusable GitLab CI/CD templates (`include: project: fri-mag/rso/ci-templates`). |
-| `gitlab-profile` | group meta | Tibor Koderman | Group README shown on the group page (source: `docs/gitlab-profile/README.md`). |
+| `.github` | org meta | Tibor Koderman | Organization profile and reusable GitHub Actions workflows (GitLab mirror: `ci-templates`). |
+| `gitlab-profile` | group meta (GitLab only) | Tibor Koderman | GitLab group README (source: `docs/gitlab-profile/README.md`). |
 
-Branches in every project: `main` (protected: no direct push, maintainers merge via merge request) and `dev` (integration). Required approvals are a paid GitLab feature, so "1 review before merge" is a team rule, not an enforced setting.
+Branches in every repository: `main` (protected by a ruleset: pull request + 1 approval, no force push or deletion) and `dev` (integration).
 
-Team accounts: sign-up is disabled on the instance, so Amar and Eva need accounts created by the admin and Maintainer access to the group.
+Team access: invite Amar and Eva to the GitHub organization (and, for the mirror, create their GitLab accounts).
