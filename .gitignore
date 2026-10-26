@@ -1,0 +1,15 @@
+# Course materials (copyrighted, UL FRI) — kept locally only, never published
+/instructions/
+
+# Build outputs
+*.aux
+*.log
+*.out
+*.toc
+reports/**/build/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
