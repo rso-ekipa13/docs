@@ -2,7 +2,7 @@
 # Creates the same repositories in an existing GitHub organization (idempotent) — for a later mirror of fri-mag/rso.
 #
 #   scripts/bootstrap-github-org.sh <org> [--dry-run]     create repos, descriptions, topics, dev branch
-#   scripts/bootstrap-github-org.sh <org> --protect       add the main-branch ruleset (run after the first pushes)
+#   scripts/bootstrap-github-org.sh <org> --protect       add the branch rulesets (run after the first pushes)
 #
 # Needs: gh (authenticated: gh auth login -s admin:org), an existing organization
 # (create it at https://github.com/organizations/plan, Free plan).
@@ -60,11 +60,28 @@ protect_main() {
 JSON
 }
 
+# Merged issue branches are deleted automatically; dev and release branches are kept.
+keep_dev_release() {
+  local repo="$1"
+  if gh api "repos/$org/$repo/rulesets" --jq '.[].name' 2>/dev/null | grep -qx keep-dev-release; then
+    echo "ruleset exists: $org/$repo keep-dev-release"; return
+  fi
+  run gh api -X POST "repos/$org/$repo/rulesets" --input - <<'JSON'
+{
+  "name": "keep-dev-release",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["refs/heads/dev", "refs/heads/release", "refs/heads/release/**"], "exclude": [] } },
+  "rules": [ { "type": "deletion" } ]
+}
+JSON
+}
+
 for entry in "${repos[@]}"; do
   IFS='|' read -r name desc topics <<<"$entry"
 
   if [[ "$mode" == "--protect" ]]; then
-    protect_main "$name"; continue
+    protect_main "$name"; keep_dev_release "$name"; continue
   fi
 
   if gh repo view "$org/$name" >/dev/null 2>&1; then
