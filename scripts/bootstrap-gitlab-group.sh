@@ -28,7 +28,7 @@ repos=(
   "media-service|End-to-end encrypted attachments: SAS upload and download (valet key), metadata, quotas and expiry. .NET 10, PostgreSQL, Azure Blob Storage.|microservice,dotnet,azure-blob-storage,postgresql"
   "notification-service|Content-free push notifications via Firebase Cloud Messaging; device push tokens and preferences. .NET 10, PostgreSQL.|microservice,dotnet,fcm,postgresql"
   "media-functions|Azure Functions that validate uploaded encrypted attachments (Event Grid) and purge expired ones (timer).|serverless,azure-functions,dotnet"
-  "client-app|Flutter client (Android and web) with on-device MLS end-to-end encryption, rich text and encrypted images.|flutter,dart,mls,e2ee"
+  "client-app|Flutter client (Android, iOS and web) with on-device MLS end-to-end encryption, rich text and encrypted images.|flutter,dart,mls,e2ee"
   "platform|Terraform for Azure, cluster platform (Envoy Gateway, NATS, ScyllaDB, CloudNativePG, observability) and the local dev environment.|terraform,kubernetes,helm,aks"
   "docs|Architecture (C4, ADRs), requirements compliance, topic submission and the final technical report (Slovenian).|documentation,architecture"
   "ci-templates|Reusable GitLab CI/CD templates shared by all service repositories.|gitlab-ci"
