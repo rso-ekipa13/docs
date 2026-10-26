@@ -15,7 +15,8 @@ This repository holds the documentation: architecture, decisions, requirement tr
 | `docs/decisions.md` | Open and accepted team decisions with options and recommendations |
 | `docs/adr/` | Architecture decision records (Slovenian) |
 | `docs/repos.md` | Repository map, owners and descriptions |
-| `scripts/` | Organization bootstrap (GitHub or GitLab) |
+| `docs/gitlab-profile/README.md` | Group README (pushed to the `gitlab-profile` project) |
+| `scripts/` | Group bootstrap (GitLab; GitHub variant for a mirror) |
 | `project.md` | Course metadata for the team's tooling |
 
 ## Building the reports
@@ -26,37 +27,29 @@ Requirements: `pandoc` ≥ 3, `lualatex` (TeX Live with `polyglossia`, `pdflscap
 make -C reports/01-prijava-teme
 ```
 
-## Creating the organization repositories
+## Repositories
 
-1. Create the organization `sepet-chat` at <https://github.com/organizations/plan> (Free plan) and invite the team.
-2. Authenticate: `gh auth login -s admin:org`.
-3. Preview, then create:
+All projects live in the public GitLab group <https://gitlab.koderverse.com/fri-mag/rso> (one project per microservice, see `docs/repos.md`). They were created with:
 
 ```bash
-scripts/bootstrap-github-org.sh sepet-chat --dry-run
+scripts/bootstrap-gitlab-group.sh --dry-run
 ```
 
 ```bash
-scripts/bootstrap-github-org.sh sepet-chat
+scripts/bootstrap-gitlab-group.sh
 ```
 
-4. Push this repository as `docs`, then protect `main` everywhere:
-
-```bash
-git remote add origin https://github.com/sepet-chat/docs.git
-```
+After the first pushes, `main` is protected in every project (no direct push, merge requests only):
 
 ```bash
-git push -u origin main dev
+scripts/bootstrap-gitlab-group.sh --protect
 ```
 
-```bash
-scripts/bootstrap-github-org.sh sepet-chat --protect
-```
+`scripts/bootstrap-github-org.sh` creates the same layout in a GitHub organization, for a later mirror.
 
 ## Branching
 
-`main` is protected (pull request + 1 review) and always deployable; `dev` is the integration branch. Work happens on `feat/<issue>-<slug>` branches merged into `dev` by pull request; releases are pull requests from `dev` to `main`.
+`main` is protected (merge requests only, one review by team rule) and always deployable; `dev` is the integration branch. Work happens on `feat/<issue>-<slug>` branches merged into `dev` by merge request; releases are merge requests from `dev` to `main`.
 
 ## Course material
 

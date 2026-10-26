@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Creates the Šepet repositories in an existing GitHub organization (idempotent).
+# Creates the same repositories in an existing GitHub organization (idempotent) — for a later mirror of fri-mag/rso.
 #
 #   scripts/bootstrap-github-org.sh <org> [--dry-run]     create repos, descriptions, topics, dev branch
 #   scripts/bootstrap-github-org.sh <org> --protect       add the main-branch ruleset (run after the first pushes)
@@ -12,12 +12,12 @@ org="${1:?usage: $0 <org> [--dry-run|--protect]}"
 mode="${2:-}"
 
 run() {
-  if [[ "$mode" == "--dry-run" ]]; then printf '+ %q ' "$@"; echo; else "$@"; fi
+  if [[ "$mode" == "--dry-run" ]]; then printf '+'; printf ' %q' "$@"; echo; else "$@"; fi
 }
 
 # name|description|topics   (description = microservice description, see docs/repos.md)
 repos=(
-  "identity-service|Accounts, organizations (tenants), devices and roles; links app accounts to Keycloak. .NET 10, PostgreSQL.|microservice,dotnet,postgresql,keycloak"
+  "identity-service|Identity provider (OAuth 2.0 / OpenID Connect) and account service: users, organizations (tenants), devices and roles. .NET 10, PostgreSQL.|microservice,dotnet,postgresql,oidc"
   "keys-service|Public key directory: device identity keys, one-time MLS KeyPackages and a hash-chained key-change log. .NET 10, PostgreSQL.|microservice,dotnet,postgresql,mls,e2ee"
   "conversation-service|1:1 and group conversations with Event Sourcing and CQRS; GraphQL read model and gRPC membership API. .NET 10, Marten/PostgreSQL.|microservice,dotnet,event-sourcing,cqrs,graphql,grpc"
   "message-service|MLS delivery service: stores and orders end-to-end encrypted envelopes, device sync and disappearing messages. .NET 10, ScyllaDB.|microservice,dotnet,scylladb,nats,e2ee"
@@ -25,8 +25,8 @@ repos=(
   "media-service|End-to-end encrypted attachments: SAS upload and download (valet key), metadata, quotas and expiry. .NET 10, PostgreSQL, Azure Blob Storage.|microservice,dotnet,azure-blob-storage,postgresql"
   "notification-service|Content-free push notifications via Firebase Cloud Messaging; device push tokens and preferences. .NET 10, PostgreSQL.|microservice,dotnet,fcm,postgresql"
   "media-functions|Azure Functions that validate uploaded encrypted attachments (Event Grid) and purge expired ones (timer).|serverless,azure-functions,dotnet"
-  "sepet-app|Flutter client (Android and web) with on-device MLS end-to-end encryption, rich text and encrypted images.|flutter,dart,mls,e2ee"
-  "platform|Terraform for Azure, cluster platform (Envoy Gateway, Keycloak, NATS, ScyllaDB, CloudNativePG, observability) and the local dev environment.|terraform,kubernetes,helm,aks"
+  "client-app|Flutter client (Android and web) with on-device MLS end-to-end encryption, rich text and encrypted images.|flutter,dart,mls,e2ee"
+  "platform|Terraform for Azure, cluster platform (Envoy Gateway, NATS, ScyllaDB, CloudNativePG, observability) and the local dev environment.|terraform,kubernetes,helm,aks"
   "docs|Architecture (C4, ADRs), requirements compliance, topic submission and the final technical report (Slovenian).|documentation,architecture"
   ".github|Organization profile and reusable CI/CD workflows.|github-actions"
 )

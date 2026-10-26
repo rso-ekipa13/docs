@@ -8,14 +8,10 @@ digraph sepet {
 
   // ---------- odjemalec ----------
   app [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" style="rounded" color="#2f6fd6" bgcolor="#e8f1ff">
-      <tr><td><b>sepet-app</b> (Flutter: Android + splet)</td></tr>
+      <tr><td><b>client-app</b> (Flutter: Android + splet)</td></tr>
       <tr><td><font point-size="8.5">ključi in šifriranje E2E samo na napravi · lokalna šifrirana zgodovina</font></td></tr></table>>];
 
   // ---------- rob: IAM, prehod, Azure ----------
-  kc [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" style="rounded" color="#1f8a4c" bgcolor="#ffffff">
-      <tr><td bgcolor="#1f8a4c"><font color="white"><b>Keycloak</b> (IAM)</font></td></tr>
-      <tr><td><font point-size="8">OIDC / OAuth 2.0 · MFA<br/>organizacije = najemniki</font></td></tr>
-      <tr><td bgcolor="#eef1f5"><font point-size="8">PostgreSQL · <i>keycloak</i></font></td></tr></table>>];
 
   gw [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" style="rounded" color="#c77700" bgcolor="#fff4e0">
       <tr><td><b>Prehod API — Envoy Gateway</b> (Gateway API)</td></tr>
@@ -36,8 +32,8 @@ digraph sepet {
       <tr><td><font point-size="8">imenik javnih ključev<br/>paketi ključev naprav<br/>dnevnik sprememb ključev</font></td></tr>
       <tr><td bgcolor="#eef1f5"><font point-size="8">PostgreSQL<br/><i>keys</i></font></td></tr></table>>];
     identity [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" style="rounded" color="#2f6fd6" bgcolor="#ffffff">
-      <tr><td bgcolor="#2f6fd6"><font color="white"><b>identity-service</b></font></td></tr>
-      <tr><td><font point-size="8">računi · organizacije<br/>naprave · vloge<br/>povezava s Keycloakom</font></td></tr>
+      <tr><td bgcolor="#2f6fd6"><font color="white"><b>identity-service (IdP)</b></font></td></tr>
+      <tr><td><font point-size="8">OAuth 2.0 · OpenID Connect<br/>računi · organizacije<br/>naprave · vloge</font></td></tr>
       <tr><td bgcolor="#eef1f5"><font point-size="8">PostgreSQL<br/><i>identity</i></font></td></tr></table>>];
     conv [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" style="rounded" color="#2f6fd6" bgcolor="#ffffff">
       <tr><td bgcolor="#2f6fd6"><font color="white"><b>conversation-service</b></font></td></tr>
@@ -62,7 +58,7 @@ digraph sepet {
 
     nats [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" style="rounded" color="#b0306a" bgcolor="#fff0f6">
       <tr><td><b>NATS JetStream</b> — posrednik dogodkov · dostava vsaj enkrat · CloudEvents + AsyncAPI</td></tr>
-      <tr><td><font point-size="8.5">identity.* · keys.* · conversations.* · messages.* · media.*</font></td></tr></table>>];
+      <tr><td><font point-size="8.5">identity.* · keys.* · conversations.* · messages.* · media.* · realtime.*</font></td></tr></table>>];
 
   obs [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" style="rounded,dashed" color="#8892a0" bgcolor="#fafafa">
       <tr><td><b>Opazovanje</b> (vse storitve)</td></tr>
@@ -74,9 +70,9 @@ digraph sepet {
       <tr><td align="left"><font color="#0f8b8d"><b>——</b></font></td><td align="left"><font point-size="8.5">WebSocket (WSS)</font></td></tr>
       <tr><td align="left"><font color="#7b3fbf"><b>——</b></font></td><td align="left"><font point-size="8.5">gRPC (HTTP/2, Protobuf)</font></td></tr>
       <tr><td align="left"><font color="#b0306a"><b>- - -</b></font></td><td align="left"><font point-size="8.5">dogodki NATS JetStream (asinhrono)</font></td></tr>
-      <tr><td align="left"><font color="#1f8a4c"><b>——</b></font></td><td align="left"><font point-size="8.5">OIDC / OAuth 2.0</font></td></tr>
+      <tr><td align="left"><font color="#1f8a4c"><b>——</b></font></td><td align="left"><font point-size="8.5">OIDC / OAuth 2.0 (identity-service)</font></td></tr>
       <tr><td align="left"><font color="#0a6ebd"><b>——</b></font></td><td align="left"><font point-size="8.5">storitve Azure (SAS, Event Grid, HTTPS)</font></td></tr>
-      <tr><td align="left" colspan="2"><font point-size="8">Prehod, Keycloak, mikrostoritve, NATS in baze tečejo v gruči AKS;<br/>vsaka storitev dostopa samo do svoje baze.</font></td></tr>
+      <tr><td align="left" colspan="2"><font point-size="8">Prehod, mikrostoritve, NATS in baze tečejo v gruči AKS; vsaka storitev<br/>s trajnimi podatki dostopa samo do svoje baze. Vse storitve<br/>preverjajo žetone JWT s ključi JWKS iz identity-service.</font></td></tr>
     </table>>];
 
   // ---------- razporeditev ----------
@@ -89,9 +85,7 @@ digraph sepet {
 
   // ---------- odjemalec ----------
   app -> blob [label=" PUT/GET šifriranega\n bloka (URL SAS)", color="#0a6ebd", fontcolor="#0a6ebd"];
-  app -> gw  [label=" HTTPS: REST · GraphQL · WSS", color="#2f6fd6", fontcolor="#2f6fd6", penwidth=1.8];
-  app -> kc  [label="OIDC: Authorization Code + PKCE ", color="#1f8a4c", fontcolor="#1f8a4c", penwidth=1.4];
-  kc -> gw   [label="JWKS", color="#1f8a4c", fontcolor="#1f8a4c", style=dashed, constraint=false];
+  app -> gw  [label=" HTTPS: REST · GraphQL · WSS · OIDC", color="#2f6fd6", fontcolor="#2f6fd6", penwidth=1.8];
 
   // ---------- prehod -> storitve ----------
   gw -> func [style=invis];
@@ -100,25 +94,25 @@ digraph sepet {
   gw -> rt       [label="WSS", color="#0f8b8d", fontcolor="#0f8b8d", penwidth=1.3];
   gw -> msg      [label="REST", color="#2f6fd6", fontcolor="#2f6fd6"];
   gw -> conv     [label="REST\nGraphQL", color="#2f6fd6", fontcolor="#2f6fd6"];
-  gw -> identity [label="REST", color="#2f6fd6", fontcolor="#2f6fd6"];
+  gw -> identity [label="OIDC · REST\nJWKS", color="#1f8a4c", fontcolor="#1f8a4c", penwidth=1.4];
   gw -> keys     [label="REST", color="#2f6fd6", fontcolor="#2f6fd6"];
 
   // ---------- sinhrono med storitvami ----------
   conv -> identity [label="gRPC", color="#7b3fbf", fontcolor="#7b3fbf", penwidth=1.5, constraint=false];
   msg  -> conv     [label="gRPC", color="#7b3fbf", fontcolor="#7b3fbf", penwidth=1.5, constraint=false];
-  kc -> identity   [label="Admin REST", color="#1f8a4c", fontcolor="#1f8a4c", style=dashed, dir=back];
   fcm -> notif     [label="HTTPS + OAuth 2.0", color="#555555", fontcolor="#555555", dir=back];
   blob -> media    [label="izda SAS", color="#0a6ebd", fontcolor="#0a6ebd", style=dashed, dir=back];
   blob -> func     [label="Event Grid\nBlobCreated", color="#0a6ebd", fontcolor="#0a6ebd", style=dashed];
-  func -> media    [label="HTTPS\n(OAuth 2.0)", color="#0a6ebd", fontcolor="#0a6ebd", constraint=false];
+  func -> media    [label="HTTPS prek prehoda\n(OAuth 2.0)", color="#0a6ebd", fontcolor="#0a6ebd", constraint=false];
+  fcm -> app       [label="potisno obvestilo\nbrez vsebine", color="#555555", fontcolor="#555555", style=dashed, constraint=false];
 
   // ---------- dogodki ----------
   edge [color="#b0306a", fontcolor="#b0306a", style=dashed, penwidth=1.2, labelfontsize=7.5];
   keys     -> nats [dir=both, taillabel="pub/sub"];
   identity -> nats [taillabel="pub"];
-  conv     -> nats [taillabel="pub"];
+  conv     -> nats [dir=both, taillabel="pub/sub"];
   msg      -> nats [dir=both, taillabel="pub/sub"];
-  rt       -> nats [dir=back, taillabel="sub"];
+  rt       -> nats [dir=both, taillabel="pub/sub"];
   media    -> nats [dir=both, taillabel="pub/sub"];
   notif    -> nats [dir=back, taillabel="sub"];
 }
