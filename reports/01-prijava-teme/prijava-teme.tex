@@ -1,4 +1,4 @@
-% Prijava teme projekta — RSO 2026/27, Projektna ekipa 13. Izris: make (lualatex)
+% Prijava teme projekta — RSO 2026/27, Projektna skupina 13. Izris: make (lualatex)
 \documentclass[11pt,a4paper]{article}
 \usepackage[top=2.3cm,bottom=2.3cm,left=2.4cm,right=2.4cm,headsep=0.8cm]{geometry}
 \usepackage{fontspec}
@@ -9,146 +9,118 @@
 \usepackage{polyglossia}
 \setdefaultlanguage{slovenian}
 \usepackage{xcolor}
-\definecolor{ink}{HTML}{1F2A37}
-\definecolor{accent}{HTML}{2F5E9E}
+\definecolor{ink}{HTML}{1F2937}
 \definecolor{muted}{HTML}{6B7280}
 \definecolor{rule}{HTML}{D1D5DB}
 \usepackage{graphicx,booktabs,tabularx,array,enumitem,caption}
 \usepackage[hidelinks]{hyperref}
-\urlstyle{sf}
+\urlstyle{same}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
+\usepackage{pdflscape}
 \usepackage[document]{ragged2e}
 
-\titleformat{\section}{\sffamily\large\bfseries\color{ink}}{\color{accent}\thesection}{0.7em}{}
+\titleformat{\section}{\sffamily\large\bfseries\color{ink}}{\thesection}{0.6em}{}
 \titleformat{\subsection}{\sffamily\normalsize\bfseries\color{ink}}{}{0em}{}
-\titlespacing*{\section}{0pt}{1.3em}{0.5em}
+\titlespacing*{\section}{0pt}{1.4em}{0.5em}
 \titlespacing*{\subsection}{0pt}{0.8em}{0.3em}
 \setlist{nosep, leftmargin=1.4em, itemsep=1pt}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5pt}
 \setlength{\emergencystretch}{3em}
-\captionsetup{font={small,sf}, labelfont={bf,color=accent}, labelsep=period, skip=6pt}
+\captionsetup{font=small, labelfont=bf, labelsep=period, skip=6pt}
 \renewcommand{\arraystretch}{1.25}
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\sffamily\footnotesize\color{muted} Šepet — prijava teme projekta}
-\fancyhead[R]{\sffamily\footnotesize\color{muted} RSO 2026/27 · Projektna skupina 13}
-\fancyfoot[C]{\sffamily\footnotesize\color{muted}\thepage}
+\fancyhead[L]{\footnotesize\color{muted} Šepet, prijava teme projekta}
+\fancyhead[R]{\footnotesize\color{muted} RSO 2026/27, projektna skupina 13}
+\fancyfoot[C]{\footnotesize\color{muted}\thepage}
 \renewcommand{\headrulewidth}{0pt}
-\fancypagestyle{first}{\fancyhf{}\fancyfoot[C]{\sffamily\footnotesize\color{muted}\thepage}}
+\fancypagestyle{first}{\fancyhf{}\fancyfoot[C]{\footnotesize\color{muted}\thepage}}
 
 \begin{document}
 \thispagestyle{first}
 
-{\sffamily\color{muted}\small Prijava teme projekta · Računalniške storitve v oblaku 2026/27 · UL FRI}\par\vspace{6pt}
-{\sffamily\bfseries\fontsize{24}{28}\selectfont\color{ink} Šepet}\par\vspace{2pt}
-{\sffamily\Large\color{ink} Varno sporočanje s šifriranjem od konca do konca}\par\vspace{10pt}
+{\color{muted}\small Računalniške storitve v oblaku 2026/27, prijava teme projekta}\par\vspace{6pt}
+{\sffamily\bfseries\fontsize{22}{26}\selectfont\color{ink} Šepet: aplikacija za varno sporočanje}\par\vspace{10pt}
 {\color{rule}\rule{\textwidth}{0.6pt}}\par\vspace{2pt}
-{\small
-\begin{tabularx}{\textwidth}{@{}>{\sffamily\color{muted}}l Y@{}}
-Skupina & Projektna skupina 13 — Ključarji \\
+\begin{tabularx}{\textwidth}{@{}>{\color{muted}}l Y@{}}
+Projektna skupina & 13, ime skupine Ključarji \\
 Člani & Tibor Koderman, Amar Mehić, Eva Vidic \\
-Repozitoriji & \url{https://gitlab.koderverse.com/fri-mag/rso} (en repozitorij za vsako mikrostoritev) \\
-\end{tabularx}}\par
+Repozitoriji & \url{https://gitlab.koderverse.com/fri-mag/rso} \\
+\end{tabularx}\par
 {\color{rule}\rule{\textwidth}{0.6pt}}
 
-\section{Opis projekta}
-Pri večini aplikacij za klepet moramo ponudniku zaupati, da sporočil ne bo bral ali jih predal tretjim osebam; Telegram na primer klepetov privzeto ne šifrira od konca do konca, zahteve po dostopu oblasti do zasebnih sporočil pa so vse pogostejše. Razvili bomo aplikacijo Šepet za sporočanje ena na ena in v skupinah z oblikovanim besedilom in slikami. Vsebina se šifrira na napravi pošiljatelja s standardnim protokolom MLS (RFC 9420) in dešifrira šele na napravah prejemnikov, zato strežnik hrani in posreduje le šifrirane podatke. Sistem bomo zgradili iz sedmih mikrostoritev in ga namestili v oblak Azure (Kubernetes).
+\section{Kratek opis projekta}
+Pri večini aplikacij za klepet moramo ponudniku zaupati, da naših sporočil ne bo bral in jih ne bo dal tretjim osebam. Telegram na primer klepetov privzeto ne šifrira od konca do konca, hkrati pa je vse več zahtev, da bi oblasti dobile dostop do zasebnih sporočil. Razvili bomo Šepet, aplikacijo za pogovore ena na ena in v skupinah, ki podpira oblikovano besedilo, slike in izginjajoča sporočila. Sporočila se šifrirajo na telefonu pošiljatelja s protokolom MLS (RFC 9420) in se dešifrirajo šele na napravah prejemnikov. Strežnik tako hrani in posreduje le šifrirane podatke, zato vsebine ne more prebrati. Aplikacijo bomo razvili kot sistem mikrostoritev in jo namestili v oblak Azure na Kubernetes.
 
-\section{Varnostni model}
-Strežniku zaupamo dostavo, ne pa zaupnosti:
-\begin{itemize}
-\item \textbf{Vse v pogovoru je šifrirano} — sporočila, slike in imena skupin, pa tudi tipkanje, potrdila o branju in reakcije. Strežnik vidi le, kdo je v katerem pogovoru.
-\item \textbf{Pregleden dnevnik ključev} — javni ključi naprav so v dnevniku z Merklovim drevesom, zato strežnik zamenjave ključa ne more prikriti; uporabnika lahko primerjata tudi varnostno številko s kodo QR.
-\item \textbf{Prijava brez gesel} — s ključi passkey (WebAuthn).
-\item \textbf{Obvestila brez vsebine} — potisno obvestilo napravo le zbudi; sporočilo prenese, dešifrira in prikaže aplikacija sama.
-\item \textbf{Izginjajoča sporočila} — po izteku časovnika jih izbrišejo naprave in strežnik.
-\end{itemize}
-
-\section{Tehnologije in razvojno okolje}
-{\small
-\begin{tabularx}{\textwidth}{@{}>{\sffamily}l Y@{}}
+\section{Ogrodje in razvojno okolje}
+\begin{tabularx}{\textwidth}{@{}l Y@{}}
 \toprule
-Odjemalec & Flutter (Android in splet) \\
-Šifriranje & MLS (OpenMLS), rezervna možnost Signal Protocol \\
-Mikrostoritve & .NET 10 (ASP.NET Core), Clean Architecture \\
+Uporabniški vmesnik & Flutter (Android in splet) \\
+Šifriranje & MLS z knjižnico OpenMLS \\
+Mikrostoritve & .NET 10 (ASP.NET Core) \\
 Podatkovne baze & PostgreSQL, ScyllaDB, Azure Blob Storage \\
-Komunikacija & REST, gRPC (Protobuf), WebSocket, NATS JetStream; GraphQL samo za skrbniško stran \\
-Identiteta & lasten ponudnik OAuth 2.0 / OpenID Connect v .NET (OpenIddict, passkeys) \\
-Platforma & Docker, Kubernetes (Azure AKS), Helm, Envoy Gateway, Terraform \\
-CI/CD in opazovanje & GitLab CI; Prometheus, Grafana, Loki \\
+Komunikacija & REST, gRPC s pogodbami Protobuf, WebSocket, NATS JetStream, GraphQL (le skrbniški del) \\
+Avtentikacija & lasten strežnik OAuth 2.0 in OpenID Connect v .NET, prijava s ključi passkey \\
+Infrastruktura & Docker, Kubernetes (Azure AKS), Helm, Envoy Gateway, Terraform \\
+CI/CD in nadzor & GitLab CI, Prometheus, Grafana, Loki \\
 Drugo & Azure Functions, Firebase Cloud Messaging \\
-Orodja & JetBrains Rider, VS Code, Android Studio, Docker Compose, kind, Git \\
+Razvojna orodja & JetBrains Rider, VS Code, Android Studio, Docker Compose, kind, Git \\
 \bottomrule
-\end{tabularx}}
+\end{tabularx}
 
-\section{Arhitektura}
-Aplikacija dostopa do storitev prek prehoda API, ki preverja žetone JWT in usmerja zahteve (REST, WebSocket). Kadar storitev potrebuje takojšen odgovor, kliče drugo storitev prek gRPC (npr. preverjanje članstva pri pošiljanju sporočila); dejstva, ki zanimajo več storitev, objavi kot dogodek v NATS JetStream. Vsaka storitev s trajnimi podatki ima svojo bazo, do podatkov drugih storitev pa pride le prek API-jev ali lokalnih kopij iz dogodkov; šifrirane slike potujejo neposredno v Azure Blob Storage (slika~\ref{fig:arhitektura}). Pogodbe so v repozitoriju vsake storitve: OpenAPI za REST, Protobuf za gRPC in AsyncAPI za dogodke.
+\section{Shema arhitekture}
+Aplikacija komunicira s sistemom prek prehoda API, ki preveri žeton uporabnika in zahtevo pošlje ustrezni storitvi (REST, WebSocket). Kadar storitev potrebuje odgovor takoj, pokliče drugo storitev prek gRPC, na primer pri preverjanju, ali je pošiljatelj član skupine. O dogodkih, ki zanimajo več storitev, obvešča prek NATS JetStream. Vsaka storitev, ki hrani podatke, ima svojo bazo. Na shemi (slika~\ref{fig:arhitektura}, naslednja stran) so označeni tudi repozitoriji in slike vsebnikov ter deli, ki se samodejno skalirajo.
 
-\begin{figure}[ht]
+\begin{landscape}
+\begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth]{build/arhitektura.pdf}
+\includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{build/arhitektura.pdf}
 \caption{Začetna shema arhitekture s komunikacijskimi protokoli.}
 \label{fig:arhitektura}
 \end{figure}
+\end{landscape}
 
-\section{Mikrostoritve}
-{\small
-\begin{tabularx}{\textwidth}{@{}>{\sffamily}l Y >{\RaggedRight}p{2.1cm} l@{}}
+\section{Mikrostoritve in njihove funkcionalnosti}
+\begin{tabularx}{\textwidth}{@{}l Y l@{}}
 \toprule
-\textbf{Storitev} & \textbf{Funkcionalnosti} & \textbf{Baza} & \textbf{Odgovorna oseba} \\
+\textbf{Mikrostoritev} & \textbf{Funkcionalnosti} & \textbf{Baza} \\
 \midrule
-identity & ponudnik OIDC: prijava s passkey, organizacije, vloge, naprave; skrbniški GraphQL (branje) & PostgreSQL & Tibor Koderman \\
-keys & javni ključi naprav, paketi ključev MLS, pregleden dnevnik ključev & PostgreSQL & Tibor Koderman \\
-conversation & pogovori in skupine, člani, prošnje za pogovor, časovnik izginjanja; Event Sourcing in CQRS & PostgreSQL & Amar Mehić \\
-message & šifrirana sporočila z vrstnim redom po epohi MLS, sinhronizacija naprav, samodejno brisanje & ScyllaDB & Amar Mehić \\
-realtime & WebSocket: dostava v živo, prisotnost, šifrirani efemerni dogodki & — & Amar Mehić \\
-media & nalaganje in prenos šifriranih slik, omejitve velikosti & PostgreSQL & Eva Vidic \\
-notification & potisna obvestila brez vsebine (Firebase Cloud Messaging) & PostgreSQL & Eva Vidic \\
+identity & registracija in prijava, žetoni OAuth 2.0, organizacije, vloge in naprave uporabnikov & PostgreSQL \\
+keys & javni ključi naprav, paketi ključev za vzpostavitev šifriranja, dnevnik sprememb ključev & PostgreSQL \\
+conversation & pogovori in skupine, dodajanje in odstranjevanje članov, prošnje za pogovor, nastavitev izginjanja (Event Sourcing in CQRS) & PostgreSQL \\
+message & shranjevanje šifriranih sporočil, vrstni red, sinhronizacija naprav, samodejno brisanje & ScyllaDB \\
+realtime & sprotna dostava prek WebSocketa, prisotnost uporabnikov & NATS KV \\
+media & nalaganje in prenos šifriranih slik, omejitev velikosti & PostgreSQL \\
+notification & potisna obvestila brez vsebine prek Firebase Cloud Messaging & PostgreSQL \\
 \bottomrule
-\end{tabularx}}
+\end{tabularx}
 
-Poleg tega bomo razvili aplikacijo v Flutterju in funkcijo Azure Functions, ki preveri naložene slike in briše potekle (Eva Vidic), ter skupno platformo s prehodom API, CI/CD in opazovanjem (Tibor Koderman).
-
-\section{Skaliranje}
-Mikrostoritve ne hranijo stanja, zato jih Kubernetes lahko poljubno podvaja, ko pride več uporabnikov:
-\begin{itemize}
-\item \textbf{HorizontalPodAutoscaler} doda pode storitvam identity, conversation, message in media, ko naraste obremenitev procesorja.
-\item \textbf{KEDA} skalira realtime po številu odprtih povezav WebSocket in notification po zaostanku dogodkov v NATS.
-\item \textbf{Samodejno skaliranje vozlišč AKS} doda vozlišče, ko novi podi nimajo prostora.
-\item Realtime prejema sporočila prek NATS, zato je uporabnik lahko povezan s katerimkoli podom; ScyllaDB se skalira z dodajanjem vozlišč.
-\end{itemize}
-Skaliranje bomo pokazali z obremenitvenim testom (k6) in metrikami v Grafani.
-
-\section{Namestitev in stroški}
-\begin{itemize}
-\item \textbf{Produkcija} teče v eni majhni gruči AKS (2 vozlišči z 2 vCPU), ki jo ustavimo, ko je ne uporabljamo. Baze tečejo v gruči (CloudNativePG, ScyllaDB), slike vsebnikov so v registru GitLab, zato ne plačujemo upravljanih baz, registra ali Azure Monitor. Ocena je 15–25 USD na mesec z opozorilom proračuna pri 25 USD, kar je za ves semester manj kot kredit enega študenta.
-\item \textbf{Razvoj} poteka lokalno (Docker Compose, kind); cevovodi CI tečejo na našem strežniku GitLab, dodaten izvajalec CI pa na domačem strežniku. Vse ocenjevane storitve ostanejo v Azure.
-\end{itemize}
+Poleg mikrostoritev bomo razvili aplikacijo v Flutterju in funkcijo Azure Functions, ki preveri naložene slike in briše tiste, ki jim je potekel čas.
 
 \section{Primeri uporabe}
 \begin{itemize}
-\item registracija in prijava s ključem passkey;
-\item iskanje uporabnika in prošnja za pogovor, ki jo prejemnik sprejme ali zavrne;
-\item pošiljanje sporočil z oblikovanim besedilom in stanjem dostave (poslano, dostavljeno, prebrano);
-\item pošiljanje slik;
-\item skupine: ustvarjanje, dodajanje in odstranjevanje članov;
-\item obvestila, ko aplikacija ni odprta;
-\item preverjanje varnostne številke s kodo QR;
-\item izginjajoča sporočila;
-\item upravljanje organizacije in vlog uporabnikov (skrbnik).
+\item registracija in prijava,
+\item iskanje uporabnika in začetek pogovora,
+\item pošiljanje sporočil z oblikovanim besedilom in prikaz, ali je bilo sporočilo dostavljeno in prebrano,
+\item pošiljanje slik,
+\item ustvarjanje skupine ter dodajanje in odstranjevanje članov,
+\item obvestilo o novem sporočilu, ko aplikacija ni odprta,
+\item preverjanje varnostne številke sogovornika s kodo QR,
+\item izginjajoča sporočila,
+\item upravljanje organizacije in vlog uporabnikov.
 \end{itemize}
 
-\subsection{Kompleksnejši primer: slika v skupinskem pogovoru}
+\subsection{Kompleksnejši primer: pošiljanje slike v skupino}
 \begin{enumerate}
-\item Aplikacija sliko šifrira z naključnim ključem in pri storitvi \textsf{media} dobi povezavo za nalaganje.
-\item Slika se naloži v Azure Blob Storage; funkcija Azure jo preveri in obvesti \textsf{media}.
-\item Aplikacija pošlje šifrirano sporočilo s ključem slike storitvi \textsf{message}, ta prek gRPC pri \textsf{conversation} preveri članstvo pošiljatelja.
-\item \textsf{message} sporočilo shrani v ScyllaDB in objavi dogodek v NATS JetStream.
-\item \textsf{realtime} ga dostavi povezanim članom, \textsf{notification} pa ostalim pošlje potisno obvestilo.
+\item Aplikacija sliko šifrira z naključnim ključem in od storitve media dobi povezavo za nalaganje.
+\item Slika se naloži v Azure Blob Storage, funkcija Azure jo preveri in o tem obvesti media.
+\item Aplikacija pošlje storitvi message šifrirano sporočilo s ključem slike, message pa prek gRPC pri storitvi conversation preveri, ali je pošiljatelj član skupine.
+\item Storitev message shrani sporočilo v ScyllaDB in objavi dogodek v NATS JetStream.
+\item Storitev realtime sporočilo dostavi članom, ki so povezani, storitev notification pa ostalim pošlje potisno obvestilo.
 \item Prejemniki sporočilo in sliko dešifrirajo na svojih napravah.
 \end{enumerate}
 
