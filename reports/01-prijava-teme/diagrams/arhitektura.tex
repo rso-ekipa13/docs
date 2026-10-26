@@ -35,6 +35,8 @@
   lbl/.style={fill=white, inner sep=1pt, font=\sffamily\fontsize{6.4}{7.6}\selectfont},
   zone/.style={draw=#1, rounded corners=4pt, line width=0.5pt, dash pattern=on 3pt off 2pt},
   zonelbl/.style={font=\sffamily\fontsize{6.8}{8}\selectfont\bfseries, text=#1, anchor=north west},
+  img/.style={fill=svc, draw=white, line width=0.4pt, minimum size=2.2mm, inner sep=0pt},
+  ext/.style={fill=muted!60, draw=white, line width=0.4pt, minimum size=2.2mm, inner sep=0pt, diamond},
 ]
 % ---------- storitve ----------
 \node[svc] (s0) at (1.3, 4.3) {\textbf{media}};
@@ -57,13 +59,13 @@
 }
 % ---------- NATS ----------
 \node[box=bus, fill=busbg, minimum height=6.5mm, minimum width=156mm] (nats) at (8.2, 0.75)
-  {\textbf{NATS JetStream} \quad trajni tokovi dogodkov · edini način usklajevanja podatkov med storitvami (lokalne kopije)};
+  {\textbf{NATS JetStream} \quad trajni tokovi dogodkov · edini način usklajevanja podatkov med storitvami \quad \lab{\color{muted}repozitorij platform}};
 \foreach \i in {0,...,6} {
   \draw[<->, line width=0.6pt, draw=bus, dash pattern=on 2pt off 1.5pt] ([xshift=7.6mm]s\i.south) -- ([xshift=7.6mm]s\i.south |- nats.north);
 }
 % ---------- prehod API ----------
 \node[box=edge, fill=edgebg, minimum height=7mm, minimum width=156mm] (gw) at (8.2, 6.05)
-  {\textbf{Prehod API} (Envoy Gateway) \quad TLS · preverjanje JWT · omejevanje hitrosti · usmerjanje po poti};
+  {\textbf{Prehod API} (Envoy Gateway) \quad TLS · preverjanje JWT · omejevanje hitrosti · usmerjanje po poti \quad \lab{\color{muted}repozitorij platform}};
 \foreach \i/\p in {0/REST, 1/REST, 2/REST, 3/{OIDC, REST, GraphQL\textsuperscript{*}}, 4/REST, 6/REST} {
   \draw[->, line width=0.6pt, draw=svc] (gw.south -| s\i.north) -- node[lbl]{\p} (s\i.north);
 }
@@ -73,6 +75,9 @@
 \draw[->, line width=0.8pt, draw=rpc] (s2.east) -- (s3.west);
 \node[font=\sffamily\fontsize{6.4}{7.6}\selectfont\bfseries, text=rpc] at ($(s1.north east)!0.5!(s2.north west)+(0,0.17)$) {gRPC};
 \node[font=\sffamily\fontsize{6.4}{7.6}\selectfont\bfseries, text=rpc] at ($(s2.north east)!0.5!(s3.north west)+(0,0.17)$) {gRPC};
+% ---------- oznake slik: lasten repozitorij -> lastna slika ----------
+\foreach \i in {0,...,6} { \node[img] at ([xshift=-2.2mm,yshift=-2.2mm]s\i.north east) {}; }
+\foreach \n in {gw, nats} { \node[ext] at ([xshift=-2.6mm,yshift=-2.6mm]\n.north east) {}; }
 % ---------- cona AKS ----------
 \begin{scope}[on background layer]
   \node[zone=svc, fit=(gw) (nats) (s0) (s6), inner xsep=6pt, inner ysep=12pt] (aks) {};
@@ -80,17 +85,18 @@
 \node[zonelbl=svc] at ([xshift=4pt,yshift=-2pt]aks.north west) {Gruča AKS};
 % ---------- odjemalec in zunanji ----------
 \node[box=svc, fill=white, minimum height=8.5mm, minimum width=64mm] (app) at (8.2, 7.85)
-  {\textbf{client-app} (Flutter: Android, splet)\\\lab{\color{muted}ključi in šifriranje MLS samo na napravi}};
+  {\textbf{client-app} (Flutter: Android, splet)\\\lab{\color{muted}šifriranje MLS na napravi · gradi spletno sliko in APK}};
 \node[box=muted, dash pattern=on 2pt off 1.5pt, fill=white, minimum height=8.5mm, minimum width=24mm] (fcm) at (15.1, 7.85)
   {\textbf{FCM}\\\lab{\color{muted}zunanji API}};
+\node[img] at ([xshift=-2.2mm,yshift=-2.2mm]app.north east) {};
 \draw[->, line width=0.9pt, draw=svc] (app.south) -- node[lbl]{HTTPS: REST · WebSocket · OIDC} (gw.north -| app.south);
 \draw[->, line width=0.6pt, draw=muted, dash pattern=on 2pt off 1.5pt] (fcm.west) -- node[lbl, above=1pt, fill=none]{potisno obvestilo} (app.east);
 \draw[->, line width=0.6pt, draw=muted, dash pattern=on 2pt off 1.5pt] (s6.east) -- (aks.east |- s6.east) -- ++(0.25,0) |- node[lbl, pos=0.3]{HTTPS} (fcm.east);
 % ---------- Azure PaaS ----------
 \node[cylinder, shape border rotate=90, aspect=0.22, draw=azure, fill=azurebg, minimum width=26mm, minimum height=11mm, align=center, line width=0.6pt]
   (blob) at (1.9, -1.15) {\textbf{Blob Storage}\\\lab{šifrirane slike}};
-\node[box=azure, fill=azurebg, minimum height=9mm, minimum width=32mm] (func) at (5.6, -1.15)
-  {\textbf{Azure Functions}\\\lab{preverjanje, čiščenje}};
+\node[box=azure, fill=azurebg, minimum height=9mm, minimum width=32mm] (func) at (6.0, -1.15)
+  {\textbf{media-functions}\\\lab{Azure Functions · paket, brez slike}};
 \draw[->, line width=0.6pt, draw=azure] (blob.east) -- node[lbl]{Event Grid} (func.west);
 \begin{scope}[on background layer]
   \node[zone=azure, fit=(blob) (func), inner xsep=6pt, inner ysep=10pt] (paas) {};
@@ -98,7 +104,7 @@
 \node[zonelbl=azure] at ([xshift=4pt,yshift=-2pt]paas.north west) {Azure PaaS};
 \draw[->, line width=0.6pt, draw=azure] (app.west) -- (aks.west |- app.west) -- ++(-0.25,0) |- node[lbl, pos=0.2]{nalaganje (SAS)} (blob.west);
 % ---------- legenda ----------
-\node[anchor=north west, align=left, text=muted, font=\sffamily\fontsize{6.4}{7.8}\selectfont] at (8.0, -0.45) {%
+\node[anchor=north west, align=left, text=muted, font=\sffamily\fontsize{6.4}{7.8}\selectfont] at (9.0, -0.45) {%
   \tikz{\draw[->, svc, line width=0.6pt] (0,0) -- (0.45,0);} REST / OIDC \;\;
   \tikz{\draw[->, ws, line width=0.6pt] (0,0) -- (0.45,0);} WebSocket \;\;
   \tikz{\draw[->, rpc, line width=0.8pt] (0,0) -- (0.45,0);} gRPC (Protobuf) \;\;
@@ -106,6 +112,8 @@
   \tikz[baseline=-0.6ex]{\node[cylinder, shape border rotate=90, aspect=0.25, draw=db, fill=dbbg, minimum width=2.6mm, minimum height=3mm, inner sep=0] {};} trajna baza \;\;
   \tikz[baseline=-0.6ex]{\node[cylinder, shape border rotate=90, aspect=0.25, draw=mem, fill=membg, minimum width=2.6mm, minimum height=3mm, inner sep=0] {};} v pomnilniku \;\;
   \textsuperscript{*}GraphQL samo za skrbniško stran (branje)\\[3pt]
+  \tikz[baseline=-0.6ex]{\node[img] {};} lasten repozitorij → lastna slika vsebnika (ime = ime repozitorija)\\[2pt]
+  \tikz[baseline=-0.6ex]{\node[ext] {};} zunanja slika (prehod, NATS, baze), namesti jo repozitorij platform (Helm)\\[3pt]
   PostgreSQL: ena gruča CloudNativePG z ločeno bazo in uporabnikom za vsako\\
   storitev; primarni strežnik + replika (pretakanje WAL). ScyllaDB: 3 replike v produkciji.};
 \end{tikzpicture}
