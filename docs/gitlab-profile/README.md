@@ -1,24 +1,50 @@
-# Šepet — end-to-end encrypted messaging (RSO 2026/27, UL FRI)
+# Pretty Good Pigeon
 
-Šepet is a messenger for 1:1 and group chats with rich text and images, where content is encrypted and decrypted only on the participants' devices (MLS, RFC 9420). The server stores and routes ciphertext; it never holds decryption keys.
+A messenger where only the people in a conversation can read it.
 
-Projektna ekipa 13 "Ključarji": Tibor Koderman, Amar Mehić, Eva Vidic.
+Messages, photos, group names and even typing indicators are encrypted on your phone before they leave it, using MLS (RFC 9420), the IETF standard for group encryption. Our servers store and forward ciphertext and never hold the keys to read it. The name is a nod to PGP, and to the oldest secure messaging network there is: carrier pigeons.
 
-| Project | Role |
+We are ekipa 13 (Tibor Koderman, Amar Mehić and Eva Vidic), and this is our project for the Cloud Computing course (Računalniške storitve v oblaku) at the Faculty of Computer and Information Science, University of Ljubljana, 2026/27.
+
+## How it works
+
+```mermaid
+flowchart LR
+  app["App (Android, iOS, web)"] -->|HTTPS| gw["API gateway"]
+  gw --> identity & keys & conversation & message & media & notification
+  gw -->|WebSocket| realtime
+  message -->|gRPC| conversation
+  conversation -->|gRPC| identity
+  message -. events .-> nats[("NATS")]
+  nats -.-> realtime & notification
+  notification --> fcm["FCM / APNs"]
+  app -->|encrypted upload| blob[("Blob Storage")]
+```
+
+The app talks to a single API gateway. Behind it, each part of the system is a small service with its own database. Services that need an answer right away call each other over gRPC; everything else is announced as an event on NATS, so a slow or offline service never blocks a message from being delivered. It all runs on Kubernetes in Azure.
+
+## Repositories
+
+| Repository | What it does |
 | --- | --- |
-| [identity-service](https://gitlab.koderverse.com/fri-mag/rso/identity-service) | Identity provider (OAuth 2.0 / OIDC), accounts, organizations (tenants), devices, roles |
-| [keys-service](https://gitlab.koderverse.com/fri-mag/rso/keys-service) | Public key directory, MLS KeyPackages, key-change log |
-| [conversation-service](https://gitlab.koderverse.com/fri-mag/rso/conversation-service) | Conversations and groups — Event Sourcing, CQRS, gRPC |
-| [message-service](https://gitlab.koderverse.com/fri-mag/rso/message-service) | Encrypted envelope store and ordering (ScyllaDB) |
-| [realtime-service](https://gitlab.koderverse.com/fri-mag/rso/realtime-service) | WebSocket live delivery and presence |
-| [media-service](https://gitlab.koderverse.com/fri-mag/rso/media-service) | Encrypted attachments via SAS (Azure Blob Storage) |
-| [notification-service](https://gitlab.koderverse.com/fri-mag/rso/notification-service) | Content-free push notifications (Firebase Cloud Messaging) |
-| [media-functions](https://gitlab.koderverse.com/fri-mag/rso/media-functions) | Azure Functions: attachment validation and expiry |
-| [client-app](https://gitlab.koderverse.com/fri-mag/rso/client-app) | Flutter client (Android, iOS, web) |
-| [platform](https://gitlab.koderverse.com/fri-mag/rso/platform) | Terraform, cluster platform, local dev environment |
-| [docs](https://gitlab.koderverse.com/fri-mag/rso/docs) | Architecture, ADRs, compliance, reports |
-| [ci-templates](https://gitlab.koderverse.com/fri-mag/rso/ci-templates) | Shared GitLab CI/CD templates |
+| [identity-service](https://gitlab.koderverse.com/fri-mag/rso/identity-service) | sign-in with passkeys, tokens, organizations and devices |
+| [keys-service](https://gitlab.koderverse.com/fri-mag/rso/keys-service) | public keys and MLS key packages |
+| [conversation-service](https://gitlab.koderverse.com/fri-mag/rso/conversation-service) | chats, groups and members (event sourced) |
+| [message-service](https://gitlab.koderverse.com/fri-mag/rso/message-service) | storing and ordering encrypted messages |
+| [realtime-service](https://gitlab.koderverse.com/fri-mag/rso/realtime-service) | live delivery over WebSocket, presence |
+| [media-service](https://gitlab.koderverse.com/fri-mag/rso/media-service) | encrypted image uploads and downloads |
+| [notification-service](https://gitlab.koderverse.com/fri-mag/rso/notification-service) | content-free push notifications |
+| [media-functions](https://gitlab.koderverse.com/fri-mag/rso/media-functions) | Azure Functions that check and clean up uploads |
+| [client-app](https://gitlab.koderverse.com/fri-mag/rso/client-app) | the Flutter app |
+| [platform](https://gitlab.koderverse.com/fri-mag/rso/platform) | Terraform, cluster setup, local environment |
+| [docs](https://gitlab.koderverse.com/fri-mag/rso/docs) | architecture, decisions and plan |
 
-Stack: .NET 10 · Flutter · ScyllaDB · PostgreSQL · NATS JetStream · Envoy Gateway · Azure Kubernetes Service · Helm · GitLab CI · Terraform · OpenTelemetry, Prometheus, Grafana, Loki.
+## Built with
 
-Every service project has the same layout (Clean Architecture, `helm/` chart, `.gitlab-ci.yml` including the shared templates) and branches `main` (protected) and `dev`.
+.NET 10 · Flutter · OpenMLS · PostgreSQL · ScyllaDB · NATS JetStream · Envoy Gateway · Kubernetes on Azure (AKS) · Helm · Terraform · GitHub Actions (GitLab mirror) · Prometheus, Grafana and Loki
+
+## Status
+
+We are at the design stage. The first services and the app skeleton are planned for early November 2026, and the finished system is due in January 2027.
+
+This group is a mirror of [github.com/rso-ekipa13](https://github.com/rso-ekipa13), where development happens.

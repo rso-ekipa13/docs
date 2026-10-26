@@ -1,12 +1,14 @@
 # Course materials (copyrighted, UL FRI) — kept locally only, never published
 /instructions/
 
+# Reports stay local until they are final
+/reports/
+
 # Build outputs
 *.aux
 *.log
 *.out
 *.toc
-reports/**/build/
 
 # Editors / OS
 .vscode/
