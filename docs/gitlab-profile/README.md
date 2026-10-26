@@ -8,7 +8,7 @@ Projektna ekipa 13 "Ključarji": Tibor Koderman, Amar Mehić, Eva Vidic.
 | --- | --- |
 | [identity-service](https://gitlab.koderverse.com/fri-mag/rso/identity-service) | Identity provider (OAuth 2.0 / OIDC), accounts, organizations (tenants), devices, roles |
 | [keys-service](https://gitlab.koderverse.com/fri-mag/rso/keys-service) | Public key directory, MLS KeyPackages, key-change log |
-| [conversation-service](https://gitlab.koderverse.com/fri-mag/rso/conversation-service) | Conversations and groups — Event Sourcing, CQRS, GraphQL, gRPC |
+| [conversation-service](https://gitlab.koderverse.com/fri-mag/rso/conversation-service) | Conversations and groups — Event Sourcing, CQRS, gRPC |
 | [message-service](https://gitlab.koderverse.com/fri-mag/rso/message-service) | Encrypted envelope store and ordering (ScyllaDB) |
 | [realtime-service](https://gitlab.koderverse.com/fri-mag/rso/realtime-service) | WebSocket live delivery and presence |
 | [media-service](https://gitlab.koderverse.com/fri-mag/rso/media-service) | Encrypted attachments via SAS (Azure Blob Storage) |
