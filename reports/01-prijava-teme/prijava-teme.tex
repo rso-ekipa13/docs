@@ -15,7 +15,6 @@
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
-\usepackage{flushend}
 \setlist{nosep, leftmargin=*}
 \renewcommand{\IEEEkeywordsname}{Ključne besede}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
@@ -95,8 +94,8 @@ Storitev & Funkcionalnosti \\
 \midrule
 identity & ponudnik OIDC: prijava s passkey, organizacije, vloge, naprave \\
 keys & javni ključi naprav, paketi ključev MLS, pregleden dnevnik ključev \\
-conversation & pogovori in skupine, člani, prošnje za pogovor; Event Sourcing, CQRS, GraphQL \\
-message & hramba šifriranih sporočil, vrstni red sprememb skupine po epohi MLS, sinhronizacija naprav \\
+conversation & pogovori in skupine, člani, prošnje za pogovor, časovnik izginjanja; Event Sourcing, CQRS, GraphQL \\
+message & hramba šifriranih sporočil s samodejnim brisanjem (TTL v ScyllaDB), vrstni red sprememb skupine po epohi MLS, sinhronizacija naprav \\
 realtime & WebSocket: dostava v živo, prisotnost, šifrirani efemerni dogodki \\
 media & nalaganje in prenos šifriranih slik, omejitve velikosti \\
 notification & potisna obvestila brez vsebine (Firebase Cloud Messaging) \\
@@ -106,6 +105,7 @@ notification & potisna obvestila brez vsebine (Firebase Cloud Messaging) \\
 Tabela~\ref{tab:storitve} našteva sedem mikrostoritev. Message uporablja ScyllaDB, realtime je brez baze, ostale imajo vsaka svojo bazo PostgreSQL. Dopolnjujeta jih aplikacija v Flutterju in funkcija Azure Functions, ki preveri naložene slike in briše potekle. Delo smo razdelili tako: Tibor Koderman (identity, keys, platforma), Amar Mehić (conversation, message, realtime), Eva Vidic (media, notification, funkcije, aplikacija).
 
 \section{Primeri uporabe}
+\subsection{Seznam primerov uporabe}
 \begin{itemize}
 \item registracija in prijava s ključem passkey;
 \item iskanje uporabnika in prošnja za pogovor, ki jo prejemnik sprejme ali zavrne;
@@ -114,11 +114,11 @@ Tabela~\ref{tab:storitve} našteva sedem mikrostoritev. Message uporablja Scylla
 \item skupine: ustvarjanje, dodajanje in odstranjevanje članov;
 \item obvestila, ko aplikacija ni odprta;
 \item preverjanje varnostne številke s kodo QR;
-\item izginjajoča sporočila;
+\item izginjajoča sporočila: časovnik nastavi pogovor, naprave in strežnik pa sporočila in slike po izteku izbrišejo;
 \item upravljanje organizacije in vlog (skrbnik).
 \end{itemize}
 
-\medskip\noindent\textbf{Kompleksnejši primer: slika v skupinskem pogovoru.}
+\subsection{Kompleksnejši primer: slika v skupinskem pogovoru}
 \begin{enumerate}
 \item Aplikacija sliko šifrira z naključnim ključem in pri storitvi media dobi povezavo za nalaganje.
 \item Slika se naloži v Blob Storage; funkcija Azure jo preveri in obvesti media.
