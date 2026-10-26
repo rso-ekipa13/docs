@@ -20,9 +20,9 @@ enc() { python3 -c 'import sys,urllib.parse; print(urllib.parse.quote(sys.argv[1
 
 # name|description|topics   (description = microservice description, see docs/repos.md)
 repos=(
-  "identity-service|Identity provider (OAuth 2.0 / OpenID Connect) and account service: users, organizations (tenants), devices and roles. .NET 10, PostgreSQL.|microservice,dotnet,postgresql,oidc"
+  "identity-service|Identity provider (OAuth 2.0 / OpenID Connect with passkeys) and account service: users, organizations (tenants), devices, roles; read-only admin GraphQL. .NET 10, PostgreSQL.|microservice,dotnet,postgresql,oidc"
   "keys-service|Public key directory: device identity keys, one-time MLS KeyPackages and a hash-chained key-change log. .NET 10, PostgreSQL.|microservice,dotnet,postgresql,mls,e2ee"
-  "conversation-service|1:1 and group conversations with Event Sourcing and CQRS; GraphQL read model and gRPC membership API. .NET 10, Marten/PostgreSQL.|microservice,dotnet,event-sourcing,cqrs,graphql,grpc"
+  "conversation-service|1:1 and group conversations with Event Sourcing and CQRS; gRPC membership API. .NET 10, Marten/PostgreSQL.|microservice,dotnet,event-sourcing,cqrs,graphql,grpc"
   "message-service|MLS delivery service: stores and orders end-to-end encrypted envelopes, device sync and disappearing messages. .NET 10, ScyllaDB.|microservice,dotnet,scylladb,nats,e2ee"
   "realtime-service|WebSocket gateway for live delivery, presence and typing indicators. .NET 10, NATS.|microservice,dotnet,websocket,nats"
   "media-service|End-to-end encrypted attachments: SAS upload and download (valet key), metadata, quotas and expiry. .NET 10, PostgreSQL, Azure Blob Storage.|microservice,dotnet,azure-blob-storage,postgresql"

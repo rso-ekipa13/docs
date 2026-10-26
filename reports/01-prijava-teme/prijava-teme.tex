@@ -76,7 +76,7 @@ Odjemalec & Flutter (Android in splet) \\
 Šifriranje & MLS (OpenMLS), rezervna možnost Signal Protocol \\
 Mikrostoritve & .NET 10 (ASP.NET Core), Clean Architecture \\
 Podatkovne baze & PostgreSQL, ScyllaDB, Azure Blob Storage \\
-Komunikacija & REST, GraphQL, gRPC, WebSocket, NATS JetStream \\
+Komunikacija & REST, gRPC (Protobuf), WebSocket, NATS JetStream; GraphQL samo za skrbniško stran \\
 Identiteta & lasten ponudnik OAuth 2.0 / OpenID Connect v .NET (OpenIddict, passkeys) \\
 Platforma & Docker, Kubernetes (Azure AKS), Helm, Envoy Gateway, Terraform \\
 CI/CD in opazovanje & GitLab CI; Prometheus, Grafana, Loki \\
@@ -86,7 +86,7 @@ Orodja & JetBrains Rider, VS Code, Android Studio, Docker Compose, kind, Git \\
 \end{tabularx}}
 
 \section{Arhitektura}
-Aplikacija dostopa do storitev prek prehoda API, ki preverja žetone JWT in usmerja zahteve (REST, GraphQL, WebSocket). Kadar storitev potrebuje takojšen odgovor, kliče drugo storitev prek gRPC (npr. preverjanje članstva pri pošiljanju sporočila); dejstva, ki zanimajo več storitev, objavi kot dogodek v NATS JetStream. Vsaka storitev s trajnimi podatki ima svojo bazo, šifrirane slike pa potujejo neposredno v Azure Blob Storage (slika~\ref{fig:arhitektura}).
+Aplikacija dostopa do storitev prek prehoda API, ki preverja žetone JWT in usmerja zahteve (REST, WebSocket). Kadar storitev potrebuje takojšen odgovor, kliče drugo storitev prek gRPC (npr. preverjanje članstva pri pošiljanju sporočila); dejstva, ki zanimajo več storitev, objavi kot dogodek v NATS JetStream. Vsaka storitev s trajnimi podatki ima svojo bazo, do podatkov drugih storitev pa pride le prek API-jev ali lokalnih kopij iz dogodkov; šifrirane slike potujejo neposredno v Azure Blob Storage (slika~\ref{fig:arhitektura}). Pogodbe so v repozitoriju vsake storitve: OpenAPI za REST, Protobuf za gRPC in AsyncAPI za dogodke.
 
 \begin{figure}[ht]
 \centering
@@ -101,9 +101,9 @@ Aplikacija dostopa do storitev prek prehoda API, ki preverja žetone JWT in usme
 \toprule
 \textbf{Storitev} & \textbf{Funkcionalnosti} & \textbf{Baza} & \textbf{Odgovorna oseba} \\
 \midrule
-identity & ponudnik OIDC: prijava s passkey, organizacije, vloge, naprave & PostgreSQL & Tibor Koderman \\
+identity & ponudnik OIDC: prijava s passkey, organizacije, vloge, naprave; skrbniški GraphQL (branje) & PostgreSQL & Tibor Koderman \\
 keys & javni ključi naprav, paketi ključev MLS, pregleden dnevnik ključev & PostgreSQL & Tibor Koderman \\
-conversation & pogovori in skupine, člani, prošnje za pogovor, časovnik izginjanja; Event Sourcing, CQRS, GraphQL & PostgreSQL & Amar Mehić \\
+conversation & pogovori in skupine, člani, prošnje za pogovor, časovnik izginjanja; Event Sourcing in CQRS & PostgreSQL & Amar Mehić \\
 message & šifrirana sporočila z vrstnim redom po epohi MLS, sinhronizacija naprav, samodejno brisanje & ScyllaDB & Amar Mehić \\
 realtime & WebSocket: dostava v živo, prisotnost, šifrirani efemerni dogodki & — & Amar Mehić \\
 media & nalaganje in prenos šifriranih slik, omejitve velikosti & PostgreSQL & Eva Vidic \\
@@ -122,6 +122,12 @@ Mikrostoritve ne hranijo stanja, zato jih Kubernetes lahko poljubno podvaja, ko 
 \item Realtime prejema sporočila prek NATS, zato je uporabnik lahko povezan s katerimkoli podom; ScyllaDB se skalira z dodajanjem vozlišč.
 \end{itemize}
 Skaliranje bomo pokazali z obremenitvenim testom (k6) in metrikami v Grafani.
+
+\section{Namestitev in stroški}
+\begin{itemize}
+\item \textbf{Produkcija} teče v eni majhni gruči AKS (2 vozlišči z 2 vCPU), ki jo ustavimo, ko je ne uporabljamo. Baze tečejo v gruči (CloudNativePG, ScyllaDB), slike vsebnikov so v registru GitLab, zato ne plačujemo upravljanih baz, registra ali Azure Monitor. Ocena je 15–25 USD na mesec z opozorilom proračuna pri 25 USD, kar je za ves semester manj kot kredit enega študenta.
+\item \textbf{Razvoj} poteka lokalno (Docker Compose, kind); cevovodi CI tečejo na našem strežniku GitLab, dodaten izvajalec CI pa na domačem strežniku. Vse ocenjevane storitve ostanejo v Azure.
+\end{itemize}
 
 \section{Primeri uporabe}
 \begin{itemize}

@@ -4,9 +4,9 @@ Group: <https://gitlab.koderverse.com/fri-mag/rso> (public). One public project 
 
 | Project | Kind | Owner | Description |
 |---|---|---|---|
-| `identity-service` | microservice | Tibor Koderman | Identity provider (OAuth 2.0 / OpenID Connect) and account service: users, organizations (tenants), devices and roles. .NET 10, PostgreSQL. |
+| `identity-service` | microservice | Tibor Koderman | Identity provider (OAuth 2.0 / OpenID Connect with passkeys) and account service: users, organizations (tenants), devices, roles; read-only admin GraphQL. .NET 10, PostgreSQL. |
 | `keys-service` | microservice | Tibor Koderman | Public key directory: device identity keys, one-time MLS KeyPackages and a hash-chained key-change log. .NET 10, PostgreSQL. |
-| `conversation-service` | microservice | Amar Mehić | 1:1 and group conversations with Event Sourcing and CQRS; GraphQL read model and gRPC membership API. .NET 10, Marten/PostgreSQL. |
+| `conversation-service` | microservice | Amar Mehić | 1:1 and group conversations with Event Sourcing and CQRS; gRPC membership API. .NET 10, Marten/PostgreSQL. |
 | `message-service` | microservice | Amar Mehić | MLS delivery service: stores and orders end-to-end encrypted envelopes, device sync and disappearing messages. .NET 10, ScyllaDB. |
 | `realtime-service` | microservice | Amar Mehić | WebSocket gateway for live delivery, presence and typing indicators. .NET 10, NATS. |
 | `media-service` | microservice | Eva Vidic | End-to-end encrypted attachments: SAS upload and download (valet key), metadata, quotas and expiry. .NET 10, PostgreSQL, Azure Blob Storage. |
