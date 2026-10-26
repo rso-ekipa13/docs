@@ -1,52 +1,26 @@
-# Pretty Good Pigeon — documentation
+# Pretty Good Pigeon: docs
 
-Pretty Good Pigeon is an end-to-end encrypted messenger (1:1 and group chats, rich text, encrypted images) built as a cloud-native microservice application for the course *Računalniške storitve v oblaku* (UL FRI, 2026/27) by **ekipa 13**: Tibor Koderman, Amar Mehić, Eva Vidic.
+Design notes, decisions and planning for [Pretty Good Pigeon](https://github.com/rso-ekipa13), the end-to-end encrypted messenger that ekipa 13 (Tibor Koderman, Amar Mehić, Eva Vidic) is building for the Cloud Computing course at UL FRI, 2026/27.
 
-This repository holds the documentation: architecture, decisions, requirement tracking and the reports. Source code lives in one repository per microservice in the GitHub organization <https://github.com/rso-ekipa13> (see `docs/repos.md`).
+The code lives in separate repositories, one per service; [repos.md](docs/repos.md) lists them. This repository is where we keep track of what we are building and why.
 
-## Contents
+## What's here
 
-| Path | What |
-|---|---|
-| `reports/` | Reports (topic submission, final report). Kept locally and out of git until they are final. |
-| `COMPLIANCE.md` | Every course requirement, its status, interpretations and deviations |
-| `PLAN.md` | Implementation plan: waves, owners, conventions, budget, risks |
-| `docs/decisions.md` | Open and accepted team decisions with options and recommendations |
-| `docs/adr/` | Architecture decision records (Slovenian) |
-| `docs/repos.md` | Repository map, owners and descriptions |
-| `docs/github-profile/README.md` | GitHub organization profile (in `rso-ekipa13/.github`) |
-| `docs/gitlab-profile/README.md` | GitLab group README (mirror) |
-| `scripts/` | Organization bootstrap (GitHub primary, GitLab mirror) |
-| `project.md` | Course metadata for the team's tooling |
+- [PLAN.md](PLAN.md): the implementation plan, week by week, with owners and conventions.
+- [COMPLIANCE.md](COMPLIANCE.md): every course requirement and how far along we are with it.
+- [docs/decisions.md](docs/decisions.md): decisions we made, the alternatives, and why.
+- [docs/adr/](docs/adr/): architecture decision records, in Slovenian, used later in the final report.
+- [docs/demo-script.md](docs/demo-script.md): what we will show for each requirement at the final presentation.
+- [docs/repos.md](docs/repos.md): the repositories, their owners and descriptions.
+- `scripts/`: scripts that created the repositories on GitHub and the GitLab mirror.
+- `reports/`: the topic submission and later the final report. These stay on our machines until they are final, so the folder is ignored by git.
 
-## Building the reports
+## Repositories and mirror
 
-Requirements: `lualatex` (TeX Live with `polyglossia`, TikZ, Libertinus and TeX Gyre fonts); Markdown-based reports also need `pandoc` ≥ 3 and the Inter font.
+GitHub ([rso-ekipa13](https://github.com/rso-ekipa13)) is where development happens. The same projects are mirrored on our GitLab ([fri-mag/rso](https://gitlab.koderverse.com/fri-mag/rso)), which we may later use for CI. In this repository, `origin` pushes to both.
 
-```bash
-make -C reports/01-prijava-teme
-```
+## How we work
 
-## Repositories
+`main` is protected and only changes through pull requests. Day-to-day work goes to `dev` or to a feature branch merged into `dev`, and `dev` is merged into `main` when something is ready.
 
-Primary: the public GitHub organization <https://github.com/rso-ekipa13>, one repository per microservice (`docs/repos.md`), created with:
-
-```bash
-scripts/bootstrap-github-org.sh rso-ekipa13
-```
-
-After the first pushes, `main` is protected everywhere (pull request + 1 review):
-
-```bash
-scripts/bootstrap-github-org.sh rso-ekipa13 --protect
-```
-
-Mirror: the GitLab group <https://gitlab.koderverse.com/fri-mag/rso> (same project names, created with `scripts/bootstrap-gitlab-group.sh`). In this repository `origin` pushes to both.
-
-## Branching
-
-`main` is protected (pull request + 1 review) and always deployable; `dev` is the integration branch. Work happens on `feat/<issue>-<slug>` branches merged into `dev` by pull request; releases are pull requests from `dev` to `main`.
-
-## Course material
-
-`instructions/` (lecture slides, instructions) is copyrighted course material and is kept out of git.
+Course material from učilnica stays in `instructions/`, which is not committed because it is copyrighted.
