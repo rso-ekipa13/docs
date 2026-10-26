@@ -14,7 +14,7 @@ Projektna ekipa 13 "Ključarji": Tibor Koderman, Amar Mehić, Eva Vidic.
 | [media-service](https://gitlab.koderverse.com/fri-mag/rso/media-service) | Encrypted attachments via SAS (Azure Blob Storage) |
 | [notification-service](https://gitlab.koderverse.com/fri-mag/rso/notification-service) | Content-free push notifications (Firebase Cloud Messaging) |
 | [media-functions](https://gitlab.koderverse.com/fri-mag/rso/media-functions) | Azure Functions: attachment validation and expiry |
-| [client-app](https://gitlab.koderverse.com/fri-mag/rso/client-app) | Flutter client (Android + web) |
+| [client-app](https://gitlab.koderverse.com/fri-mag/rso/client-app) | Flutter client (Android, iOS, web) |
 | [platform](https://gitlab.koderverse.com/fri-mag/rso/platform) | Terraform, cluster platform, local dev environment |
 | [docs](https://gitlab.koderverse.com/fri-mag/rso/docs) | Architecture, ADRs, compliance, reports |
 | [ci-templates](https://gitlab.koderverse.com/fri-mag/rso/ci-templates) | Shared GitLab CI/CD templates |

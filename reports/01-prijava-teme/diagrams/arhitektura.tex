@@ -32,7 +32,7 @@
   svc/.style={draw=svc, fill=svcbg, rounded corners=2pt, text width=17mm, minimum height=11mm, align=center, line width=0.6pt,
               double copy shadow={shadow xshift=1.1pt, shadow yshift=-1.1pt, draw=svc!55, fill=white}},
   single/.style={draw=#1, rounded corners=2pt, align=center, line width=0.6pt, inner sep=3pt},
-  store/.style={cylinder, shape border rotate=90, aspect=0.22, draw=db, fill=dbbg, minimum width=15.5mm, minimum height=11.5mm,
+  store/.style={cylinder, shape border rotate=90, aspect=0.22, draw=db, fill=dbbg, minimum width=16.5mm, minimum height=12mm,
                 align=center, line width=0.6pt, inner sep=1pt},
   memstore/.style={store, draw=mem, fill=membg, dash pattern=on 2pt off 1.2pt},
   lbl/.style={fill=white, inner sep=1pt, font=\sffamily\fontsize{6.3}{7.5}\selectfont},
@@ -58,31 +58,28 @@
   \node[scalepill, anchor=south west] at ([xshift=2pt,yshift=-3.5pt]s\i.north west) {\faUpRightAndDownLeftFromCenter\ \t};
 }
 % ---------- shrambe (vsaka storitev svojo) ----------
-\node[store] (d0) at (1.12, 2.3)  {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{media}};
-\node[store] (d1) at (3.42, 2.3)  {\faDatabase\\[1pt]\textbf{ScyllaDB}\\\lab{sporočila}};
-\node[store] (d2) at (5.72, 2.3)  {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{dogodki}};
-\node[store] (d3) at (8.02, 2.3)  {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{identity}};
-\node[store] (d4) at (10.32, 2.3) {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{keys}};
+\node[store] (d0) at (1.12, 2.3)  {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{media · ×2}};
+\node[store] (d1) at (3.42, 2.3)  {\faDatabase\\[1pt]\textbf{ScyllaDB}\\\lab{sporočila · ×3}};
+\node[store] (d2) at (5.72, 2.3)  {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{dogodki · ×2}};
+\node[store] (d3) at (8.02, 2.3)  {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{identity · ×2}};
+\node[store] (d4) at (10.32, 2.3) {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{keys · ×2}};
 \node[memstore] (d5) at (12.62, 2.3) {\faMemory\\[1pt]\textbf{NATS KV}\\\lab{prisotnost}};
-\node[store] (d6) at (14.92, 2.3) {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{notifications}};
+\node[store] (d6) at (14.92, 2.3) {\faDatabase\\[1pt]\textbf{PostgreSQL}\\\lab{obvestila · ×2}};
 \foreach \i/\p in {0/SQL, 1/CQL, 2/SQL, 3/SQL, 4/SQL, 5/KV, 6/SQL} {
   \draw[<->, line width=0.6pt, draw=db] (s\i.south -| d\i.north) -- node[lbl]{\p} (d\i.north);
 }
-\foreach \i/\t in {0/{×2}, 1/{×3}, 2/{×2}, 3/{×2}, 4/{×2}, 6/{×2}} {
-  \node[replpill, anchor=west] at ([xshift=-3pt,yshift=1pt]d\i.after top) {\t};
-}
 % ---------- NATS ----------
 \node[single=bus, fill=busbg, minimum height=7mm, minimum width=156mm] (nats) at (8.2, 0.7)
-  {\textcolor{bus}{\faTowerBroadcast}\ \ \textbf{NATS JetStream}\quad dogodki med storitvami · trajni tokovi · lokalne kopije podatkov drugih storitev};
+  {\textcolor{bus}{\faTowerBroadcast}\ \ \textbf{NATS JetStream}\quad dogodki med storitvami};
 \foreach \i in {0,...,6} {
   \draw[<->, line width=0.6pt, draw=bus, dash pattern=on 2pt off 1.5pt] ([xshift=7.6mm]s\i.south) -- ([xshift=7.6mm]s\i.south |- nats.north);
 }
 \node[extmark, anchor=north east] at ([xshift=-2pt,yshift=-2pt]nats.north east) {\faDocker};
 % ---------- prehod API ----------
 \node[single=svc, fill=white, minimum height=7.5mm, minimum width=156mm] (gw) at (8.2, 6.1)
-  {\textcolor{svc}{\faShieldHalved}\ \ \textbf{Prehod API} (Envoy Gateway)\quad TLS · preverjanje JWT · omejevanje hitrosti · usmerjanje po poti};
+  {\textcolor{svc}{\faShieldHalved}\ \ \textbf{Prehod API} (Envoy Gateway)\quad TLS · JWT · omejevanje hitrosti};
 \node[extmark, anchor=north east] at ([xshift=-2pt,yshift=-2pt]gw.north east) {\faDocker};
-\node[scalepill, anchor=south west] at ([xshift=4pt,yshift=-3.5pt]gw.north west) {\faUpRightAndDownLeftFromCenter\ HPA};
+\node[scalepill, anchor=west] at ([xshift=4pt]gw.west) {\faUpRightAndDownLeftFromCenter\ HPA};
 \foreach \i/\p in {0/REST, 1/REST, 2/REST, 3/{OIDC · REST · GraphQL\textsuperscript{*}}, 4/REST, 6/REST} {
   \draw[->, line width=0.6pt, draw=svc] (gw.south -| s\i.north) -- node[lbl]{\p} (s\i.north);
 }
@@ -94,41 +91,39 @@
 \begin{scope}[on background layer]
   \node[zone=svc, fit=(gw) (nats) (s0) (s6), inner xsep=7pt, inner ysep=14pt] (aks) {};
 \end{scope}
-\node[zonelbl=svc] at ([xshift=4pt,yshift=-2pt]aks.north west) {\faDharmachakra\ Gruča AKS · imenski prostor sepet-prod};
-\node[font=\sffamily\fontsize{6.3}{7.5}\selectfont, text=scale, anchor=north east] at ([xshift=-4pt,yshift=-2pt]aks.north east)
-  {\faServer\ samodejno skaliranje vozlišč (1–3)};
+\node[zonelbl=svc, anchor=south west] at ([xshift=2pt,yshift=1pt]aks.north west) {\faDharmachakra\ Gruča AKS};
+\node[font=\sffamily\fontsize{6.3}{7.5}\selectfont, text=scale, anchor=south east] at ([xshift=-2pt,yshift=1pt]aks.north east)
+  {\faServer\ vozlišča 1–3};
 % ---------- odjemalec in zunanji ----------
 \node[single=svc, fill=white, minimum height=9mm, minimum width=62mm] (app) at (8.2, 8.0)
-  {\textcolor{svc}{\faMobileScreen\,\faGlobe}\ \ \textbf{client-app} (Flutter)\\\lab{\color{muted}Android in splet · šifriranje MLS na napravi}};
+  {\textcolor{svc}{\faAndroid\,\faApple\,\faGlobe}\ \ \textbf{client-app} (Flutter)\\\lab{\color{muted}Android, iOS, splet · šifriranje na napravi}};
 \node[imgmark, anchor=north east] at ([xshift=-2pt,yshift=-2pt]app.north east) {\faDocker};
 \node[single=line, dash pattern=on 2pt off 1.5pt, fill=white, minimum height=9mm, minimum width=26mm] (fcm) at (15.1, 8.0)
   {\textcolor{muted}{\faGoogle}\ \ \textbf{FCM}\\\lab{\color{muted}zunanji API}};
-\draw[->, line width=0.9pt, draw=svc] (app.south) -- node[lbl]{HTTPS: REST · WebSocket · OIDC} (gw.north -| app.south);
+\draw[->, line width=0.9pt, draw=svc] (app.south) -- node[lbl, pos=0.35]{HTTPS} (gw.north -| app.south);
 \draw[->, line width=0.6pt, draw=line, dash pattern=on 2pt off 1.5pt] (fcm.west) -- node[lbl, above=1pt, fill=none, text=muted]{potisno obvestilo} (app.east);
-\draw[->, line width=0.6pt, draw=line, dash pattern=on 2pt off 1.5pt] (s6.east) -- (aks.east |- s6.east) -- ++(0.25,0) |- node[lbl, pos=0.3, text=muted]{HTTPS} (fcm.east);
+\draw[->, line width=0.6pt, draw=line, dash pattern=on 2pt off 1.5pt] (s6.east) -- (aks.east |- s6.east) -- ++(0.25,0) |- (fcm.east);
 % ---------- Azure PaaS ----------
 \node[cylinder, shape border rotate=90, aspect=0.22, draw=azure, fill=azurebg, minimum width=27mm, minimum height=12mm, align=center, line width=0.6pt]
-  (blob) at (1.95, -1.3) {\textcolor{azure}{\faBoxArchive}\ \textbf{Blob Storage}\\\lab{šifrirane slike}};
-\node[single=azure, fill=azurebg, minimum height=10mm, minimum width=33mm] (func) at (6.05, -1.3)
-  {\textcolor{azure}{\faBolt}\ \textbf{media-functions}\\\lab{Azure Functions · paket}};
+  (blob) at (1.95, -1.75) {\textcolor{azure}{\faBoxArchive}\ \textbf{Blob Storage}\\\lab{šifrirane slike}};
+\node[single=azure, fill=azurebg, minimum height=10mm, minimum width=33mm] (func) at (6.45, -1.75)
+  {\textcolor{azure}{\faBolt}\ \textbf{media-functions}\\\lab{Azure Functions}};
 \node[scalepill, anchor=south west] at ([xshift=3pt,yshift=-3.5pt]func.north west) {\faUpRightAndDownLeftFromCenter\ Flex};
 \draw[->, line width=0.6pt, draw=azure] (blob.east) -- node[lbl]{Event Grid} (func.west);
 \begin{scope}[on background layer]
   \node[zone=azure, fit=(blob) (func), inner xsep=7pt, inner ysep=12pt] (paas) {};
 \end{scope}
 \node[zonelbl=azure] at ([xshift=4pt,yshift=-2pt]paas.north west) {\faCloud\ Azure PaaS};
-\draw[->, line width=0.6pt, draw=azure] (app.west) -- (aks.west |- app.west) -- ++(-0.25,0) |- node[lbl, pos=0.2]{nalaganje (SAS)} (blob.west);
+\draw[->, line width=0.6pt, draw=azure] (app.west) -- (aks.west |- app.west) -- ++(-0.25,0) |- node[lbl, pos=0.25]{SAS} (blob.west);
 % ---------- legenda ----------
-\node[anchor=north west, align=left, text=muted, font=\sffamily\fontsize{6.3}{8.4}\selectfont] at (9.1, -0.45) {%
-  \tikz{\draw[->, svc, line width=0.6pt] (0,0) -- (0.42,0);} REST / OIDC \;\;
-  \tikz{\draw[->, ws, line width=0.6pt] (0,0) -- (0.42,0);} WebSocket \;\;
-  \tikz{\draw[->, rpc, line width=0.8pt] (0,0) -- (0.42,0);} gRPC (Protobuf) \;\;
-  \tikz{\draw[<->, bus, line width=0.6pt, dash pattern=on 2pt off 1.5pt] (0,0) -- (0.42,0);} dogodki\\
-  \textcolor{svc}{\faDocker} lasten repozitorij in slika \;\;
-  \textcolor{line}{\faDocker} zunanja slika (repozitorij platform) \;\;
-  \textcolor{scale}{\faUpRightAndDownLeftFromCenter} samodejno skaliranje\\
-  \textcolor{db}{\faDatabase} trajna baza \;\; \textcolor{mem}{\faMemory} v pomnilniku \;\;
-  {\color{db}\pill{×2}} replike (CloudNativePG: primarni + replika; ScyllaDB ×3)\\
-  \textsuperscript{*}GraphQL samo za skrbniško stran (branje) \;\; PostgreSQL: ena gruča, ločena baza na storitev};
+\node[anchor=north west, align=left, text=muted, font=\sffamily\fontsize{6.4}{8.6}\selectfont] at (9.4, -0.95) {%
+  \tikz[baseline=-0.6ex]{\draw[->, draw=svc, line width=0.6pt] (0,0) -- (0.4,0);}\ REST, OIDC \quad
+  \tikz[baseline=-0.6ex]{\draw[->, ws, line width=0.6pt] (0,0) -- (0.4,0);}\ WebSocket \quad
+  \tikz[baseline=-0.6ex]{\draw[->, rpc, line width=0.8pt] (0,0) -- (0.4,0);}\ gRPC \quad
+  \tikz[baseline=-0.6ex]{\draw[<->, bus, line width=0.6pt, dash pattern=on 2pt off 1.5pt] (0,0) -- (0.4,0);}\ dogodki\\
+  \textcolor{svc}{\faDocker}\ naša slika \quad \textcolor{line}{\faDocker}\ zunanja slika \quad
+  \textcolor{scale}{\faUpRightAndDownLeftFromCenter}\ samodejno skaliranje\\
+  \textcolor{db}{\faDatabase}\ baza \quad \textcolor{mem}{\faMemory}\ v pomnilniku \quad ×2\ število replik\\
+  \textsuperscript{*}GraphQL le za skrbnika};
 \end{tikzpicture}
 \end{document}

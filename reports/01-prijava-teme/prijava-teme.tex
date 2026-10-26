@@ -54,32 +54,32 @@ Repozitoriji & \url{https://gitlab.koderverse.com/fri-mag/rso} \\
 {\color{rule}\rule{\textwidth}{0.6pt}}
 
 \section{Kratek opis projekta}
-Pri večini aplikacij za klepet moramo ponudniku zaupati, da naših sporočil ne bo bral in jih ne bo dal tretjim osebam. Telegram na primer klepetov privzeto ne šifrira od konca do konca, hkrati pa je vse več zahtev, da bi oblasti dobile dostop do zasebnih sporočil. Razvili bomo Šepet, aplikacijo za pogovore ena na ena in v skupinah, ki podpira oblikovano besedilo, slike in izginjajoča sporočila. Sporočila se šifrirajo na telefonu pošiljatelja s protokolom MLS (RFC 9420) in se dešifrirajo šele na napravah prejemnikov. Strežnik tako hrani in posreduje le šifrirane podatke, zato vsebine ne more prebrati. Aplikacijo bomo razvili kot sistem mikrostoritev in jo namestili v oblak Azure na Kubernetes.
+Večina aplikacij za klepet od nas zahteva, da ponudniku zaupamo. Telegram na primer klepetov privzeto ne šifrira od konca do konca, oblasti pa vse pogosteje zahtevajo dostop do zasebnih sporočil. Šepet je aplikacija za pogovore ena na ena in v skupinah z oblikovanim besedilom, slikami in izginjajočimi sporočili. Sporočila se šifrirajo na napravi pošiljatelja s protokolom MLS (RFC 9420), zato strežnik hrani le šifrirane podatke in jih ne more prebrati. Sistem bomo zgradili iz mikrostoritev in ga namestili na Kubernetes v oblaku Azure.
 
 \section{Ogrodje in razvojno okolje}
 \begin{tabularx}{\textwidth}{@{}l Y@{}}
 \toprule
-Uporabniški vmesnik & Flutter (Android in splet) \\
-Šifriranje & MLS z knjižnico OpenMLS \\
-Mikrostoritve & .NET 10 (ASP.NET Core) \\
+Uporabniški vmesnik & Flutter (Android, iOS, splet) \\
+Šifriranje & MLS (OpenMLS) \\
+Mikrostoritve & .NET 10 \\
 Podatkovne baze & PostgreSQL, ScyllaDB, Azure Blob Storage \\
-Komunikacija & REST, gRPC s pogodbami Protobuf, WebSocket, NATS JetStream, GraphQL (le skrbniški del) \\
-Avtentikacija & lasten strežnik OAuth 2.0 in OpenID Connect v .NET, prijava s ključi passkey \\
+Komunikacija & REST, gRPC (Protobuf), WebSocket, NATS JetStream; GraphQL le za skrbnika \\
+Avtentikacija & lasten strežnik OAuth 2.0 / OpenID Connect v .NET, ključi passkey \\
 Infrastruktura & Docker, Kubernetes (Azure AKS), Helm, Envoy Gateway, Terraform \\
-CI/CD in nadzor & GitLab CI, Prometheus, Grafana, Loki \\
+CI/CD in nadzor & GitHub Actions, Prometheus, Grafana, Loki \\
 Drugo & Azure Functions, Firebase Cloud Messaging \\
-Razvojna orodja & JetBrains Rider, VS Code, Android Studio, Docker Compose, kind, Git \\
+Orodja & Rider, VS Code, Android Studio, Docker Compose, kind, Git \\
 \bottomrule
 \end{tabularx}
 
 \section{Shema arhitekture}
-Aplikacija komunicira s sistemom prek prehoda API, ki preveri žeton uporabnika in zahtevo pošlje ustrezni storitvi (REST, WebSocket). Kadar storitev potrebuje odgovor takoj, pokliče drugo storitev prek gRPC, na primer pri preverjanju, ali je pošiljatelj član skupine. O dogodkih, ki zanimajo več storitev, obvešča prek NATS JetStream. Vsaka storitev, ki hrani podatke, ima svojo bazo. Na shemi (slika~\ref{fig:arhitektura}, naslednja stran) so označeni tudi repozitoriji in slike vsebnikov ter deli, ki se samodejno skalirajo.
+Aplikacija dostopa do storitev prek prehoda API (REST, WebSocket). Kadar storitev potrebuje odgovor takoj, pokliče drugo storitev prek gRPC, sicer pošlje dogodek prek NATS JetStream. Vsaka storitev, ki hrani podatke, ima svojo bazo. Shema je na sliki~\ref{fig:arhitektura}.
 
 \begin{landscape}
 \begin{figure}[p]
 \centering
 \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{build/arhitektura.pdf}
-\caption{Začetna shema arhitekture s komunikacijskimi protokoli.}
+\caption{Začetna shema arhitekture.}
 \label{fig:arhitektura}
 \end{figure}
 \end{landscape}
@@ -89,39 +89,37 @@ Aplikacija komunicira s sistemom prek prehoda API, ki preveri žeton uporabnika 
 \toprule
 \textbf{Mikrostoritev} & \textbf{Funkcionalnosti} & \textbf{Baza} \\
 \midrule
-identity & registracija in prijava, žetoni OAuth 2.0, organizacije, vloge in naprave uporabnikov & PostgreSQL \\
-keys & javni ključi naprav, paketi ključev za vzpostavitev šifriranja, dnevnik sprememb ključev & PostgreSQL \\
-conversation & pogovori in skupine, dodajanje in odstranjevanje članov, prošnje za pogovor, nastavitev izginjanja (Event Sourcing in CQRS) & PostgreSQL \\
-message & shranjevanje šifriranih sporočil, vrstni red, sinhronizacija naprav, samodejno brisanje & ScyllaDB \\
-realtime & sprotna dostava prek WebSocketa, prisotnost uporabnikov & NATS KV \\
-media & nalaganje in prenos šifriranih slik, omejitev velikosti & PostgreSQL \\
-notification & potisna obvestila brez vsebine prek Firebase Cloud Messaging & PostgreSQL \\
+identity & prijava, žetoni OAuth 2.0, organizacije, vloge, naprave & PostgreSQL \\
+keys & javni ključi in paketi ključev naprav & PostgreSQL \\
+conversation & pogovori, skupine in člani (Event Sourcing, CQRS) & PostgreSQL \\
+message & shranjevanje in sinhronizacija šifriranih sporočil & ScyllaDB \\
+realtime & sprotna dostava, prisotnost & NATS KV \\
+media & nalaganje in prenos šifriranih slik & PostgreSQL \\
+notification & potisna obvestila (FCM) & PostgreSQL \\
 \bottomrule
 \end{tabularx}
 
-Poleg mikrostoritev bomo razvili aplikacijo v Flutterju in funkcijo Azure Functions, ki preveri naložene slike in briše tiste, ki jim je potekel čas.
+Poleg tega bomo razvili aplikacijo v Flutterju in funkcijo v Azure Functions, ki preverja naložene slike.
 
 \section{Primeri uporabe}
 \begin{itemize}
 \item registracija in prijava,
-\item iskanje uporabnika in začetek pogovora,
-\item pošiljanje sporočil z oblikovanim besedilom in prikaz, ali je bilo sporočilo dostavljeno in prebrano,
-\item pošiljanje slik,
-\item ustvarjanje skupine ter dodajanje in odstranjevanje članov,
-\item obvestilo o novem sporočilu, ko aplikacija ni odprta,
-\item preverjanje varnostne številke sogovornika s kodo QR,
+\item začetek pogovora z drugim uporabnikom,
+\item pošiljanje sporočil in slik,
+\item skupinski pogovori,
+\item potisna obvestila,
+\item preverjanje sogovornika s kodo QR,
 \item izginjajoča sporočila,
-\item upravljanje organizacije in vlog uporabnikov.
+\item upravljanje organizacije (skrbnik).
 \end{itemize}
 
-\subsection{Kompleksnejši primer: pošiljanje slike v skupino}
+\subsection{Kompleksnejši primer: slika v skupinskem pogovoru}
 \begin{enumerate}
-\item Aplikacija sliko šifrira z naključnim ključem in od storitve media dobi povezavo za nalaganje.
-\item Slika se naloži v Azure Blob Storage, funkcija Azure jo preveri in o tem obvesti media.
-\item Aplikacija pošlje storitvi message šifrirano sporočilo s ključem slike, message pa prek gRPC pri storitvi conversation preveri, ali je pošiljatelj član skupine.
-\item Storitev message shrani sporočilo v ScyllaDB in objavi dogodek v NATS JetStream.
-\item Storitev realtime sporočilo dostavi članom, ki so povezani, storitev notification pa ostalim pošlje potisno obvestilo.
-\item Prejemniki sporočilo in sliko dešifrirajo na svojih napravah.
+\item Aplikacija sliko šifrira in jo naloži v Blob Storage prek povezave, ki jo dobi od storitve media.
+\item Funkcija v Azure Functions sliko preveri in obvesti media.
+\item Aplikacija pošlje šifrirano sporočilo storitvi message, ki prek gRPC pri conversation preveri, ali je pošiljatelj član skupine.
+\item Message sporočilo shrani in objavi dogodek v NATS.
+\item Realtime ga dostavi povezanim članom, notification pa ostalim pošlje obvestilo.
 \end{enumerate}
 
 \end{document}
