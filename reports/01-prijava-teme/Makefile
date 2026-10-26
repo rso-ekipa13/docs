@@ -1,18 +1,16 @@
-# Izris prijave teme: make  (potrebuje pandoc, xelatex, graphviz in pisavo Inter)
-PANDOC ?= pandoc
-
+# Izris prijave teme: make  (potrebuje lualatex z IEEEtran in TeX Gyre ter graphviz)
 all: prijava-teme.pdf
 
 diagrams/%.pdf: diagrams/%.dot
 	dot -Tpdf $< -o $@
 
-diagrams/%.png: diagrams/%.dot
-	dot -Tpng -Gdpi=160 $< -o $@
-
-prijava-teme.pdf: prijava-teme.md diagrams/arhitektura.pdf diagrams/arhitektura.png ../_predloga/header.tex ../_predloga/defaults.yaml
-	$(PANDOC) $< --defaults ../_predloga/defaults.yaml -o $@
+prijava-teme.pdf: prijava-teme.tex diagrams/arhitektura.pdf
+	mkdir -p build
+	lualatex -interaction=nonstopmode -halt-on-error -output-directory=build $< >/dev/null
+	lualatex -interaction=nonstopmode -halt-on-error -output-directory=build $< >/dev/null
+	cp build/prijava-teme.pdf $@
 
 clean:
-	rm -f prijava-teme.pdf diagrams/*.pdf diagrams/*.png
+	rm -rf build prijava-teme.pdf diagrams/*.pdf
 
 .PHONY: all clean

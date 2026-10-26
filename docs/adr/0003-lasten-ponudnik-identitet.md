@@ -6,7 +6,7 @@ Status: sprejeto (2026-10-26)
 Aplikacija potrebuje prijavo uporabnikov, žetone za API-je (OAuth 2.0), OpenID Connect za odjemalca, organizacije (najemnike), vloge in registracijo naprav. Bonus zahteva 24 priporoča Azure AD (sprejemljiva sta AWS IAM in Keycloak). Predavanje 02-C uvršča identiteto med generične poddomene: »Lastna storitev za avtentikacijo je skoraj vedno napaka.« Pri šifriranju MLS pa potrebujemo storitev za avtentikacijo (RFC 9750), ki veže uporabnika na podpisne ključe njegovih naprav, in ne želimo, da tretji ponudnik identitet izve, kdo uporablja aplikacijo.
 
 ## Odločitev
-identity-service je lasten ponudnik identitet v .NET 10 s PostgreSQL: OpenIddict za protokol (Authorization Code + PKCE, client credentials, osveževalni žetoni z rotacijo, discovery, JWKS, userinfo), ASP.NET Core Identity za račune in gesla, TOTP kot drugi faktor in zaklepanje po neuspelih prijavah. Hkrati upravlja organizacije, vloge in naprave ter podpisuje poverilnice naprav za MLS. Prehod API in vse storitve preverjajo žetone prek JWKS. Lastne kriptografije in lastnega protokola ne pišemo.
+identity-service je lasten ponudnik identitet v .NET 10 s PostgreSQL: OpenIddict za protokol (Authorization Code + PKCE, client credentials, osveževalni žetoni z rotacijo, discovery, JWKS, userinfo), ASP.NET Core Identity za račune in prijavo s ključi passkey (WebAuthn, vgrajeno v .NET 10) namesto gesel, zaklepanje po neuspelih prijavah. Hkrati upravlja organizacije, vloge in naprave ter podpisuje poverilnice naprav za MLS. Prehod API in vse storitve preverjajo žetone prek JWKS. Lastne kriptografije in lastnega protokola ne pišemo.
 
 ## Posledice
 + identiteta je del jedra: ista storitev overja uporabnike in jamči za njihove ključe naprav (storitev za avtentikacijo v MLS)

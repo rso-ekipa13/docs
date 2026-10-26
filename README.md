@@ -8,8 +8,8 @@ This repository holds the documentation: architecture, decisions, requirement tr
 
 | Path | What |
 |---|---|
-| `reports/01-prijava-teme/` | Topic submission (Slovenian) — `prijava-teme.md` → `prijava-teme.pdf` |
-| `reports/_predloga/` | Shared pandoc/LaTeX template for all reports |
+| `reports/01-prijava-teme/` | Topic submission (Slovenian, IEEE conference template) — `prijava-teme.tex` → `prijava-teme.pdf` |
+| `reports/_predloga/` | Pandoc/LaTeX template for Markdown-based reports |
 | `COMPLIANCE.md` | Every course requirement, its status, interpretations and deviations |
 | `PLAN.md` | Implementation plan: waves, owners, conventions, budget, risks |
 | `docs/decisions.md` | Open and accepted team decisions with options and recommendations |
@@ -21,7 +21,7 @@ This repository holds the documentation: architecture, decisions, requirement tr
 
 ## Building the reports
 
-Requirements: `pandoc` ≥ 3, `lualatex` (TeX Live with `polyglossia`, `pdflscape`, `ragged2e`), Graphviz `dot`, the Inter font.
+Requirements: `lualatex` (TeX Live with `IEEEtran`, `polyglossia`, TeX Gyre fonts), Graphviz `dot`; Markdown-based reports also need `pandoc` ≥ 3 and the Inter font.
 
 ```bash
 make -C reports/01-prijava-teme

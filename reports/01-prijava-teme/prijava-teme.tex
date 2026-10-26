@@ -1,0 +1,136 @@
+% Prijava teme projekta — RSO 2026/27, Projektna ekipa 13
+% Izris: make   (lualatex, IEEEtran)
+\documentclass[conference,a4paper]{IEEEtran}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Termes}[Extension=.otf, UprightFont=texgyretermes-regular, BoldFont=texgyretermes-bold,
+  ItalicFont=texgyretermes-italic, BoldItalicFont=texgyretermes-bolditalic]
+\setsansfont{TeX Gyre Heros}[Extension=.otf, UprightFont=texgyreheros-regular, BoldFont=texgyreheros-bold,
+  ItalicFont=texgyreheros-italic, BoldItalicFont=texgyreheros-bolditalic]
+\usepackage{polyglossia}
+\setdefaultlanguage{slovenian}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\usepackage{flushend}
+\setlist{nosep, leftmargin=*}
+\renewcommand{\IEEEkeywordsname}{Ključne besede}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\begin{document}
+
+\title{Šepet: sporočanje s šifriranjem od konca do konca\\kot oblačna mikrostoritvena aplikacija}
+
+\author{\IEEEauthorblockN{Tibor Koderman, Amar Mehić, Eva Vidic}
+\IEEEauthorblockA{Projektna skupina 13 »Ključarji« · Fakulteta za računalništvo in informatiko, Univerza v Ljubljani\\
+Prijava teme projekta pri predmetu Računalniške storitve v oblaku 2026/27\\
+Repozitoriji: \url{https://gitlab.koderverse.com/fri-mag/rso}}}
+
+\maketitle
+
+\begin{abstract}
+Pri večini aplikacij za klepet moramo ponudniku zaupati, da sporočil ne bo bral ali jih predal tretjim; Telegram na primer klepetov privzeto ne šifrira od konca do konca \cite{telegram}, zahteve po dostopu oblasti do zasebnih sporočil pa so vse pogostejše. Razvili bomo aplikacijo Šepet za sporočanje ena na ena in v skupinah z oblikovanim besedilom in slikami. Vsebina se šifrira na napravi pošiljatelja s standardnim protokolom MLS \cite{rfc9420} in dešifrira šele na napravah prejemnikov, zato strežnik hrani in posreduje le šifrirane podatke. Sistem bomo zgradili iz sedmih mikrostoritev in ga namestili v oblak Azure (Kubernetes).
+\end{abstract}
+
+\begin{IEEEkeywords}
+šifriranje od konca do konca, MLS, mikrostoritve, Kubernetes, Azure
+\end{IEEEkeywords}
+
+\section{Varnostni model}
+Strežnik je zanesljiv za dostavo, ne pa za zaupnost. Iz tega izhajajo štiri odločitve:
+\begin{itemize}
+\item \textbf{Vse v pogovoru je šifrirano}: sporočila, slike, imena skupin, pa tudi tipkanje, potrdila o branju in reakcije, ki potujejo kot šifrirana sporočila MLS. Strežnik vidi le, kdo je v katerem pogovoru.
+\item \textbf{Pregleden dnevnik ključev}: javni ključi naprav so v dnevniku z Merklovim drevesom, zato strežnik zamenjave ključa ne more prikriti; uporabnika lahko primerjata tudi varnostno številko s kodo QR.
+\item \textbf{Prijava brez gesel}: s ključi passkey (WebAuthn), odpornimi proti ribarjenju.
+\item \textbf{Obvestila brez vsebine}: potisno obvestilo napravo le zbudi, aplikacija sporočilo prenese, dešifrira in prikaže sama.
+\end{itemize}
+
+\section{Tehnologije in razvojno okolje}
+\begin{table}[!t]
+\caption{Izbrane tehnologije}
+\label{tab:tehnologije}
+\centering
+\footnotesize
+\begin{tabular}{@{}L{0.27\columnwidth}L{0.67\columnwidth}@{}}
+\toprule
+Področje & Izbira \\
+\midrule
+Odjemalec & Flutter (Android in splet) \\
+Šifriranje & MLS (OpenMLS); rezerva Signal Protocol \\
+Storitve & .NET 10, ASP.NET Core, Clean Architecture \\
+Baze & PostgreSQL, ScyllaDB, Azure Blob Storage \\
+Komunikacija & REST, GraphQL, gRPC, WebSocket, NATS JetStream \\
+Identiteta & lasten ponudnik OIDC v .NET (OpenIddict, passkeys) \\
+Platforma & Docker, Kubernetes (AKS), Helm, Envoy Gateway, Terraform \\
+CI/CD & GitLab CI \\
+Opazovanje & Prometheus, Grafana, Loki \\
+Ostalo & Azure Functions, Firebase Cloud Messaging \\
+Orodja & Rider, VS Code, Android Studio, Docker Compose, kind \\
+\bottomrule
+\end{tabular}
+\end{table}
+Tabela~\ref{tab:tehnologije} povzema izbiro. Storitve pišemo v .NET 10 po načelih Clean Architecture, vsaka v svojem repozitoriju z lastnim Helm chartom in cevovodom GitLab CI.
+
+\section{Arhitektura}
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{diagrams/arhitektura.pdf}
+\caption{Začetna shema arhitekture. Modro: REST in GraphQL prek prehoda API; zeleno: OpenID Connect; vijolično: gRPC; rožnato črtkano: dogodki NATS JetStream; svetlo modro: storitve Azure.}
+\label{fig:arhitektura}
+\end{figure*}
+Shema je na sliki~\ref{fig:arhitektura}. Aplikacija dostopa do storitev prek prehoda API, ki preverja žetone JWT in usmerja zahteve (REST, GraphQL, WebSocket). Kadar storitev potrebuje takojšen odgovor, kliče drugo storitev prek gRPC (npr. preverjanje članstva pri pošiljanju), dejstva, ki zanimajo več storitev, pa objavi kot dogodek v NATS JetStream. Vsaka storitev s trajnimi podatki ima svojo bazo, šifrirane slike pa potujejo neposredno v Blob Storage.
+
+\section{Mikrostoritve}
+\begin{table}[!t]
+\caption{Mikrostoritve in njihove funkcionalnosti}
+\label{tab:storitve}
+\centering
+\footnotesize
+\begin{tabular}{@{}L{0.24\columnwidth}L{0.70\columnwidth}@{}}
+\toprule
+Storitev & Funkcionalnosti \\
+\midrule
+identity & ponudnik OIDC: prijava s passkey, organizacije, vloge, naprave \\
+keys & javni ključi naprav, paketi ključev MLS, pregleden dnevnik ključev \\
+conversation & pogovori in skupine, člani, prošnje za pogovor; Event Sourcing, CQRS, GraphQL \\
+message & hramba šifriranih sporočil, vrstni red sprememb skupine po epohi MLS, sinhronizacija naprav \\
+realtime & WebSocket: dostava v živo, prisotnost, šifrirani efemerni dogodki \\
+media & nalaganje in prenos šifriranih slik, omejitve velikosti \\
+notification & potisna obvestila brez vsebine (Firebase Cloud Messaging) \\
+\bottomrule
+\end{tabular}
+\end{table}
+Tabela~\ref{tab:storitve} našteva sedem mikrostoritev. Message uporablja ScyllaDB, realtime je brez baze, ostale imajo vsaka svojo bazo PostgreSQL. Dopolnjujeta jih aplikacija v Flutterju in funkcija Azure Functions, ki preveri naložene slike in briše potekle. Delo smo razdelili tako: Tibor Koderman (identity, keys, platforma), Amar Mehić (conversation, message, realtime), Eva Vidic (media, notification, funkcije, aplikacija).
+
+\section{Primeri uporabe}
+\begin{itemize}
+\item registracija in prijava s ključem passkey;
+\item iskanje uporabnika in prošnja za pogovor, ki jo prejemnik sprejme ali zavrne;
+\item pošiljanje sporočil z oblikovanim besedilom in stanjem dostave (poslano, dostavljeno, prebrano);
+\item pošiljanje slik;
+\item skupine: ustvarjanje, dodajanje in odstranjevanje članov;
+\item obvestila, ko aplikacija ni odprta;
+\item preverjanje varnostne številke s kodo QR;
+\item izginjajoča sporočila;
+\item upravljanje organizacije in vlog (skrbnik).
+\end{itemize}
+
+\medskip\noindent\textbf{Kompleksnejši primer: slika v skupinskem pogovoru.}
+\begin{enumerate}
+\item Aplikacija sliko šifrira z naključnim ključem in pri storitvi media dobi povezavo za nalaganje.
+\item Slika se naloži v Blob Storage; funkcija Azure jo preveri in obvesti media.
+\item Aplikacija pošlje šifrirano sporočilo s ključem slike storitvi message, ta prek gRPC pri conversation preveri članstvo.
+\item Message sporočilo shrani v ScyllaDB in objavi dogodek v NATS.
+\item Realtime ga dostavi povezanim članom, notification pa ostalim pošlje potisno obvestilo.
+\item Prejemniki sporočilo in sliko dešifrirajo na svojih napravah.
+\end{enumerate}
+
+\begin{thebibliography}{1}
+\bibitem{telegram} Telegram, »FAQ: Secret chats«, \url{https://telegram.org/faq}.
+\bibitem{rfc9420} R. Barnes et al., »The Messaging Layer Security (MLS) Protocol«, RFC 9420, IETF, 2023.
+\end{thebibliography}
+
+\end{document}
