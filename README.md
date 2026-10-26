@@ -1,6 +1,6 @@
-# Šepet — documentation
+# Pretty Good Pigeon — documentation
 
-Šepet is an end-to-end encrypted messenger (1:1 and group chats, rich text, encrypted images) built as a cloud-native microservice application for the course *Računalniške storitve v oblaku* (UL FRI, 2026/27) by **Projektna ekipa 13 "Ključarji"**: Tibor Koderman, Amar Mehić, Eva Vidic.
+Pretty Good Pigeon is an end-to-end encrypted messenger (1:1 and group chats, rich text, encrypted images) built as a cloud-native microservice application for the course *Računalniške storitve v oblaku* (UL FRI, 2026/27) by **ekipa 13**: Tibor Koderman, Amar Mehić, Eva Vidic.
 
 This repository holds the documentation: architecture, decisions, requirement tracking and the reports. Source code lives in one repository per microservice in the GitHub organization <https://github.com/rso-ekipa13> (see `docs/repos.md`).
 

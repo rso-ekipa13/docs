@@ -1,8 +1,8 @@
-# Šepet — end-to-end encrypted messaging (RSO 2026/27, UL FRI)
+# Pretty Good Pigeon — end-to-end encrypted messaging (RSO 2026/27, UL FRI)
 
-Šepet is a messenger for 1:1 and group chats with rich text and images, where content is encrypted and decrypted only on the participants' devices (MLS, RFC 9420). The server stores and routes ciphertext; it never holds decryption keys.
+Pretty Good Pigeon is a messenger for 1:1 and group chats with rich text and images, where content is encrypted and decrypted only on the participants' devices (MLS, RFC 9420). The server stores and routes ciphertext; it never holds decryption keys.
 
-Projektna ekipa 13 "Ključarji": Tibor Koderman, Amar Mehić, Eva Vidic.
+ekipa 13: Tibor Koderman, Amar Mehić, Eva Vidic.
 
 | Project | Role |
 | --- | --- |
